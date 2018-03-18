@@ -1,0 +1,115 @@
+commit ff9bf7b279fb2cbc59f665edafcd9cc7bc89edb3
+Author: Hannu Er‰laukko <hannueralaukko@gmail.com>
+Date:   Sun Mar 18 18:04:15 2018 +0200
+
+    Poistettu file1, uudelleennimetty file2 -> file22.
+
+ tiedostoja/file1  | 0
+ tiedostoja/file2  | 0
+ tiedostoja/file22 | 0
+ 3 files changed, 0 insertions(+), 0 deletions(-)
+
+commit 9494fa7c1a3f0d22f333f332d49d69237147ef97
+Author: Hannu Er‰laukko <hannueralaukko@gmail.com>
+Date:   Sun Mar 18 17:58:59 2018 +0200
+
+    Luotu hakemisto tiedostoja ja sen sis‰lle tiedostot file1, file2 ja file3.
+
+ tiedostoja/file1 | 0
+ tiedostoja/file2 | 0
+ tiedostoja/file3 | 0
+ 3 files changed, 0 insertions(+), 0 deletions(-)
+
+commit 943c5e4df09e7846e3c1a7a98adf6b1d49b7d73d
+Author: Hannu Er‰laukko <hannueralaukko@gmail.com>
+Date:   Sun Mar 18 17:50:49 2018 +0200
+
+    Tehty lis‰yksi‰ ja poistoja tiedostoihin eka.txt ja kolmas.txt
+
+ eka.txt    | 5 ++---
+ kolmas.txt | 4 +++-
+ 2 files changed, 5 insertions(+), 4 deletions(-)
+
+commit 8d59e7cf8b03c30e4532e1e5f18cc23b1a1adaac
+Author: Hannu Er‰laukko <hannueralaukko@gmail.com>
+Date:   Sun Mar 18 17:45:21 2018 +0200
+
+    Uudelleennimetty tiedosto.txt -> eka.txt
+
+ eka.txt      | 9 +++++++++
+ tiedosto.txt | 9 ---------
+ 2 files changed, 9 insertions(+), 9 deletions(-)
+
+commit 257e8efaaa386e92622a15840b0d18f2cf99885e
+Author: Hannu Er‰laukko <hannueralaukko@gmail.com>
+Date:   Sun Mar 18 17:41:40 2018 +0200
+
+    Poistettu tiedosto toinen.txt
+
+ toinen.txt | 1 -
+ 1 file changed, 1 deletion(-)
+
+commit 89da23027a35e3b998c5376aa244aa18462f8a9c
+Author: Hannu Er‰laukko <hannueralaukko@gmail.com>
+Date:   Sun Mar 18 17:38:19 2018 +0200
+
+    Poistettu osa ja lis‰tty hieman lis‰‰ tiedoston tiedosto.txt textist‰.
+
+ tiedosto.txt | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+commit 2d20fcc0e15bcfc7c3d681f2e8e374577966fca8
+Author: Hannu Er‰laukko <hannueralaukko@gmail.com>
+Date:   Sun Mar 18 17:34:46 2018 +0200
+
+    Lis‰tty paljon texti‰ tiedostoon tiedosto.txt
+
+ tiedosto.txt | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+commit 4e7586a48ec2bd6cb4587bb2ec11f226069385f9
+Author: Hannu Er‰laukko <hannueralaukko@gmail.com>
+Date:   Sun Mar 18 17:27:24 2018 +0200
+
+    Lis‰tty kansio stuff ja sen sis‰‰n tiedosto jokin.txt
+
+ stuff/jokin.txt | 0
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+
+commit 19fb20610a11dafc92a4ae30b479b0c7e08005c4
+Author: Hannu Er‰laukko <hannueralaukko@gmail.com>
+Date:   Sun Mar 18 17:25:23 2018 +0200
+
+    Muutettu tiedostoja toinen.txt ja kolmas.txt
+
+ kolmas.txt | 1 +
+ toinen.txt | 1 +
+ 2 files changed, 2 insertions(+)
+
+commit 8269752f7653d1293d2fd5bdb57e86e878251d28
+Author: Hannu Er‰laukko <hannueralaukko@gmail.com>
+Date:   Sun Mar 18 17:22:02 2018 +0200
+
+    kolmas.txt luotu
+
+ kolmas.txt | 0
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+
+commit 8dc2186dfcafe0c040298351ca1cadea208a2681
+Author: Hannu Er‰laukko <hannueralaukko@gmail.com>
+Date:   Sun Mar 18 17:17:20 2018 +0200
+
+    muutos ja lis‰ys
+
+ tiedosto.txt | 1 +
+ toinen.txt   | 0
+ 2 files changed, 1 insertion(+)
+
+commit 81edcb9cf568d447113be3c2a45a3f06cf18a2bc
+Author: Hannu Er‰laukko <hannueralaukko@gmail.com>
+Date:   Sun Mar 18 17:13:14 2018 +0200
+
+    tiedosto.txt luotu
+
+ tiedosto.txt | 0
+ 1 file changed, 0 insertions(+), 0 deletions(-)
