@@ -1,6 +1,6 @@
 # OTM-Harjoitustyö
 
-Tänne tulee pian **ohjelma** joka *tekee* jotain.
+Tänne tulee pian **ohjelma** joka *tekee* jotain hy�dyllist� tai kivaa.
 
 
 ## Tehtävät
