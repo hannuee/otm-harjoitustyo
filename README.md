@@ -1,9 +1,9 @@
-# OTM-HarjoitustyÃ¶
+# OTM-Harjoitustyö
 
-TÃ¤nne tulee pian **ohjelma** joka *tekee* jotain hyödyllistä tai kivaa.
+Tänne tulee pian **ohjelma** joka *tekee* jotain hyödyllistä tai kivaa.
 
 
-## TehtÃ¤vÃ¤t
+## Tehtävät
 
 ### Viikko1
 
