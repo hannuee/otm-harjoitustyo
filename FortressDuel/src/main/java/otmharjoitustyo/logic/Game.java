@@ -5,6 +5,7 @@ package otmharjoitustyo.logic;
 
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.awt.Color;
 
 public class Game {
     
@@ -22,7 +23,7 @@ public class Game {
     int state;
     
     private static final int AMMUNITION_RADIUS = 7;
-    private static final int EXPLOSION_RADIUS = 7;
+    private static final int EXPLOSION_RADIUS = 14;
    
     int leftCannonX;
     int leftCannonY;
@@ -35,6 +36,10 @@ public class Game {
     boolean oldAmmunitionExist;
     int oldAmmunitionX;
     int oldAmmunitionY;
+    
+    boolean explosion;
+    int explosionX;
+    int explosionY;
     
     // Tarkastetaan törmäykset maahan rajoista?
     
@@ -57,11 +62,15 @@ public class Game {
         this.state = 1;
         
         this.oldAmmunitionExist = false;
+        this.explosion = false;
     }
     
-    private int yFromNormalToImage(int y){
+    
+    // From normal to image coordinates
+    private int yTransform(int y){
         return this.gameField.getHeight() - y;
     }
+    
     
     private int ammunitionX(double seconds){
         double positionDueInitialVx = this.initialVx * seconds;
@@ -90,43 +99,131 @@ public class Game {
         return (int)(positionDueGravity + positionDueInitialVy) + positionDueCannonPosition;
     }
     
-    private void removeOldAmmunition(){
-        // x2 + y2 <= 7
+    
+    private void insertCircle(int circleX, int circleY, int radius, int color){
+        int y = circleY + radius;
+        int x = circleX - radius;
         
+        int yTarget = y - 2 * radius; // So y-loop must substract!
+        int xTarget = x + 2 * radius;
+        
+        // Loops which go through a rectangle pixel by pixel that will hold the circle to be drawn.
+        while(y >= yTarget){
+            while(x <= xTarget){
+                
+                // (x+x0)2 + (y+y0)2 <= 7
+                if((x + circleX)*(x + circleX) + (y + circleY)*(y + circleY) <= AMMUNITION_RADIUS){
+                    gameField.setRGB(x, yTransform(y), color);
+                }
+                
+                ++x;
+            }
+            --y;
+        }
     }
     
-    public int getSimulationSnapshot(double seconds){
+    private boolean insertCircleAndNotifyIfFortressImpact(int circleX, int circleY, int radius, int color){
+        int y = circleY + radius;
+        int x = circleX - radius;
+        
+        int yTarget = y - 2 * radius; // So y-loop must substract!
+        int xTarget = x + 2 * radius;
+        
+        // Loops which go through a rectangle pixel by pixel that will hold the circle to be drawn.
+        while(y >= yTarget){
+            while(x <= xTarget){
+                
+                // (x+x0)2 + (y+y0)2 <= 7
+                if((x + circleX)*(x + circleX) + (y + circleY)*(y + circleY) <= AMMUNITION_RADIUS){
+                    
+                    if(gameField.getRGB(x, y) == 0){  // Black == Fortress impact!!!
+                        return true;
+                    }
+                    
+                    gameField.setRGB(x, yTransform(y), color);
+                }
+                
+                ++x;
+            }
+            --y;
+        }
+        
+        return false;  // no impact detected
+    }
+    
+    private void removeOldAmmunitionIfExistent(){
+        if(oldAmmunitionExist){
+            insertCircle(oldAmmunitionX, oldAmmunitionY, AMMUNITION_RADIUS, Color.WHITE.getRGB());
+            oldAmmunitionExist = false;
+        }
+    }
+    
+    // GUIn tulisi käyttää ennen jokaista käyttöä statea.
+    // GUIn tulisi kysyä jokaisen metodin käytön jälkeen räjähdystä.
+    public BufferedImage getSimulationSnapshot(double seconds){
         
         // Jos ammuksella vanha sijainti niin poistetaan vanhat pixelit.
-        if(oldAmmunitionExist){
-            removeOldAmmunition();
-            oldAmmunitionExist = false;
+        removeOldAmmunitionIfExistent();
+        
+        // Lasketaan uusi ammuksen sijainti.
+        int ammunitionX = ammunitionX(seconds);
+        int ammunitionY = ammunitionY(seconds);
+        
+        // Tarkastetaan rajat:
+        // jos vas tai oik yli niin palautetaan tyhjä
+        if(ammunitionX < -AMMUNITION_RADIUS || gameField.getWidth() + AMMUNITION_RADIUS < ammunitionX){
+            ++state;
+            if(state == 5){
+                state = 1;
+            }
+            
+            return gameField;
         }
         
         
-        // Lasketaan uusi ammuksen sijainti.
+        boolean impact = false;
         
-        // Tarkastetaan rajat:
-        // jos vas tai oik yli niin null
+        // Tarkasta osuma maahan:
+        if(ammunitionY < groundLevel + AMMUNITION_RADIUS){
+            impact = true;
+        }
         
-        // tarkasta osumat maahan ja linnaan kun uusia pixeleitä merkataan.
-        //      Jos pixeli osuu linnaan tai maahan niin poista linnapixelit explode-alueelta (ja explode keskus muistiin.)
+        if(!impact){
+            // Maahan ei osuttu, tarkastetaan osuma linnoihin samalla kun piirretään ammuksen uutta paikkaa.
+            impact = insertCircleAndNotifyIfFortressImpact(ammunitionX, ammunitionY, AMMUNITION_RADIUS, Color.RED.getRGB());
+        }
         
-        // Palautetaan tilanne.
         
+        // Jos osui maahan tai linnaan.
+        if(impact){
+            // Poistetaan linnapixelit räjähdysalueelta ja samalla ammus:
+            insertCircle(ammunitionX, ammunitionY, EXPLOSION_RADIUS, Color.WHITE.getRGB());
+            
+            ++state;
+            if(state == 5){
+                state = 1;
+            }
+            
+            explosion = true;
+            explosionX = ammunitionX;
+            explosionY = ammunitionY;
+        } else {
+            oldAmmunitionExist = true;
+        }
+
         
-        return 0;
+        return gameField;
     }
     
     public int[] explosionCoordinates(){
+        if(explosion){
+            return new int[]{explosionX, explosionY};
+        }
         return null;
     }
     
-    public boolean isGameOver(){
-        if(this.state == 0){
-            return true;
-        }
-        return false;
+    public int getState(){
+        return state;
     }
     
     
