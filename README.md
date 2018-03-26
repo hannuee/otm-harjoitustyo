@@ -1,15 +1,13 @@
 # OTM-Harjoitustyö
 
-Tänne tulee pian **ohjelma** joka *tekee* jotain hyödyllistä tai kivaa.
+
+## Fortress Duel
+
+Fortress Duel on peli joka on tarkoitettu 2 pelaajan pelattavaksi toisiaan vastaan samalla tietokoneella. Pelissä pelaajat yrittävät tuhota toistensa linnoitukset ampumalla niitä vuorotellen oman linnoituksensa tykillä.
 
 
-## Tehtävät
+## Dokumentaatio
 
-### Viikko1
+[Määrittelydokumentti](https://github.com/hannuee/otm-harjoitustyo/blob/master/dokumentointi/maarittelydokumentti.md)
 
-[komentorivi.txt](https://github.com/hannuee/otm-harjoitustyo/blob/master/laskarit/viikko1/komentorivi.txt)
-
-[gitlog.txt](https://github.com/hannuee/otm-harjoitustyo/blob/master/laskarit/viikko1/gitlog.txt)
-
-
-Epäsynkrooni muutos tulossa!
+[Työaikakirjanpito](https://github.com/hannuee/otm-harjoitustyo/blob/master/dokumentointi/tyoaikakirjanpito.md)
