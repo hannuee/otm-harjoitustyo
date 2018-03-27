@@ -63,6 +63,11 @@ public class Game {
         
         this.oldAmmunitionExist = false;
         this.explosion = false;
+        
+        
+        // Testausta varten:
+        this.initialVx = 50;
+        this.initialVy = 50;
     }
     
     
@@ -134,8 +139,8 @@ public class Game {
             while(x <= xTarget){
                 
                 // (x+x0)2 + (y+y0)2 <= 7
-                if((x + circleX)*(x + circleX) + (y + circleY)*(y + circleY) <= AMMUNITION_RADIUS){
-                    
+                if((x - circleX)*(x - circleX) + (y - circleY)*(y - circleY) <= AMMUNITION_RADIUS*AMMUNITION_RADIUS){
+
                     if(gameField.getRGB(x, y) == 0){  // Black == Fortress impact!!!
                         return true;
                     }
