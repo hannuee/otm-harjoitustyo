@@ -104,32 +104,7 @@ public class Game {
         return (int)(positionDueGravity + positionDueInitialVy) + positionDueCannonPosition;
     }
     
-    
-    private void insertCircle(int circleX, int circleY, int radius, int color){
-        int y = circleY + radius;
-        int x = circleX - radius;
-        
-        int yTarget = y - 2 * radius; // So y-loop must substract!
-        int xTarget = x + 2 * radius;
-        
-        // Loops which go through a rectangle pixel by pixel that will hold the circle to be drawn.
-        while(y >= yTarget){
-            while(x <= xTarget){
-                
-                // (x+x0)2 + (y+y0)2 <= 7
-                if((x - circleX)*(x - circleX) + (y - circleY)*(y - circleY) <= radius*radius){
-                    gameField.setRGB(x, yTransform(y), color);
-                }
-                
-                ++x;
-            }
-            
-            x = circleX - radius;
-            --y;
-        }
-    }
-    
-    private boolean insertCircleAndNotifyIfFortressImpact(int circleX, int circleY, int radius, int color){
+    private boolean insertCircleWithImpactDetectionOption(int circleX, int circleY, int radius, int color, boolean detectionON){
         int y = circleY + radius;
         int x = circleX - radius;
         
@@ -143,7 +118,7 @@ public class Game {
                 // (x+x0)2 + (y+y0)2 <= 7
                 if((x - circleX)*(x - circleX) + (y - circleY)*(y - circleY) <= radius*radius){
 
-                    if(gameField.getRGB(x, yTransform(y)) == 0){  // Black == Fortress impact!!!
+                    if(detectionON && gameField.getRGB(x, yTransform(y)) == 0){  // Black == Fortress impact!!!
                         return true;
                     }
                     
@@ -157,12 +132,12 @@ public class Game {
             --y;
         }
         
-        return false;  // no impact detected
+        return false;  // No impact detected or impact detection not turned on.
     }
     
     private void removeOldAmmunitionIfExistent(){
         if(oldAmmunitionExist){
-            insertCircle(oldAmmunitionX, oldAmmunitionY, AMMUNITION_RADIUS, Color.WHITE.getRGB());
+            insertCircleWithImpactDetectionOption(oldAmmunitionX, oldAmmunitionY, AMMUNITION_RADIUS, Color.WHITE.getRGB(), false);
             oldAmmunitionExist = false;
         }
     }
@@ -199,14 +174,14 @@ public class Game {
         
         if(!impact){
             // Maahan ei osuttu, tarkastetaan osuma linnoihin samalla kun piirretään ammuksen uutta paikkaa.
-            impact = insertCircleAndNotifyIfFortressImpact(ammunitionX, ammunitionY, AMMUNITION_RADIUS, Color.RED.getRGB());
+            impact = insertCircleWithImpactDetectionOption(ammunitionX, ammunitionY, AMMUNITION_RADIUS, Color.RED.getRGB(), true);
         }
         
         
         // Jos osui maahan tai linnaan.
         if(impact){
             // Poistetaan linnapixelit räjähdysalueelta ja samalla ammus:
-            insertCircle(ammunitionX, ammunitionY, EXPLOSION_RADIUS, Color.WHITE.getRGB());
+            insertCircleWithImpactDetectionOption(ammunitionX, ammunitionY, EXPLOSION_RADIUS, Color.WHITE.getRGB(), false);
             
             ++state;
             if(state == 5){
@@ -236,6 +211,5 @@ public class Game {
     public int getState(){
         return state;
     }
-    
     
 }

@@ -52,11 +52,24 @@ public class GameGUI extends Application {
         final long startTime = System.nanoTime();
          // Simulaation näyttäminen.
         new AnimationTimer() {
+            
+            // FPS
+            int counter = 0;
+            int current = 0;
+            
             @Override
             public void handle(long nowTime) {
                 double simulationTime = (nowTime - startTime)/1000000000.0;
                 
-                System.out.println("" + simulationTime);
+                // FPS
+                int simuTime = (int)simulationTime;
+                if(current == simuTime){
+                    ++counter;
+                } else {
+                    System.out.println("Frames during " + current + "s: " + counter);
+                    current = simuTime;
+                    counter = 1;
+                }
                 
                 Image image = SwingFXUtils.toFXImage(game.getSimulationSnapshot(simulationTime), null);
                 pen.drawImage(image, 0, 0);
