@@ -59,7 +59,8 @@ public class Game {
         this.rightCannonX = rightCannonX;
         this.rightCannonY = rightCannonY;
         
-        this.state = 1;
+        // Testausta varten heti 2.
+        this.state = 2;
         
         this.oldAmmunitionExist = false;
         this.explosion = false;
@@ -70,6 +71,12 @@ public class Game {
         this.initialVy = 50;
     }
     
+    private void nextState(){
+        ++state;
+        if(state == 5){
+            state = 1;
+        }
+    }
     
     // From normal to image coordinates
     private int yTransform(int y){
@@ -81,7 +88,7 @@ public class Game {
         double positionDueInitialVx = this.initialVx * seconds;
         
         int positionDueCannonPosition;
-        if(state == 1){
+        if(state == 2){
             positionDueCannonPosition = this.leftCannonX;
         } else {
             positionDueCannonPosition = this.rightCannonX;
@@ -95,7 +102,7 @@ public class Game {
         double positionDueInitialVy = this.initialVy * seconds;
         
         int positionDueCannonPosition;
-        if(state == 1){
+        if(state == 2){
             positionDueCannonPosition = this.leftCannonY;
         } else {
             positionDueCannonPosition = this.rightCannonY;
@@ -151,6 +158,9 @@ public class Game {
     // GUIn tulisi käyttää ennen jokaista käyttöä statea.
     // GUIn tulisi kysyä jokaisen metodin käytön jälkeen räjähdystä.
     public BufferedImage getSimulationSnapshot(double seconds){
+        if(state != 2 && state != 4){
+            return null;
+        }
         
         // Jos ammuksella vanha sijainti niin poistetaan vanhat pixelit.
         removeOldAmmunitionIfExistent();
@@ -162,11 +172,7 @@ public class Game {
         // Tarkastetaan rajat:
         // jos vas tai oik yli niin palautetaan tyhjä
         if(ammunitionX < -AMMUNITION_RADIUS || gameField.getWidth() + AMMUNITION_RADIUS < ammunitionX){
-            ++state;
-            if(state == 5){
-                state = 1;
-            }
-            
+            nextState();
             return gameField;
         }
         
@@ -189,10 +195,7 @@ public class Game {
             // Poistetaan linnapixelit räjähdysalueelta ja samalla ammus:
             insertCircleWithImpactDetectionOption(ammunitionX, ammunitionY, EXPLOSION_RADIUS, Color.WHITE.getRGB(), false);
             
-            ++state;
-            if(state == 5){
-                state = 1;
-            }
+            nextState();
             
             explosion = true;
             explosionX = ammunitionX;
@@ -205,6 +208,12 @@ public class Game {
 
         
         return gameField;
+    }
+    
+    public void setAndFireCannon(int initialVx, int initialVy){
+        this.initialVx = initialVx;
+        this.initialVy = initialVy;
+        nextState();
     }
     
     public int[] explosionCoordinates(){

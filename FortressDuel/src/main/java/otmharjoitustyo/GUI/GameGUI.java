@@ -49,9 +49,11 @@ public class GameGUI extends Application {
         BorderPane layout = new BorderPane();
         layout.setCenter(canvas);
         
-        final long startTime = System.nanoTime();
+        
          // Simulaation näyttäminen.
         new AnimationTimer() {
+            
+            long startTime = System.nanoTime();
             
             // FPS
             int counter = 0;
@@ -71,8 +73,14 @@ public class GameGUI extends Application {
                     counter = 1;
                 }
                 
-                Image image = SwingFXUtils.toFXImage(game.getSimulationSnapshot(simulationTime), null);
-                pen.drawImage(image, 0, 0);
+                BufferedImage gameImage = game.getSimulationSnapshot(simulationTime);
+                if(gameImage != null){
+                    Image image = SwingFXUtils.toFXImage(gameImage, null);
+                    pen.drawImage(image, 0, 0);
+                } else {
+                    game.setAndFireCannon(-50, 50);  // TESTAAMISEEN.
+                    startTime = System.nanoTime();
+                }
             }
         }.start();
         
