@@ -117,12 +117,14 @@ public class Game {
             while(x <= xTarget){
                 
                 // (x+x0)2 + (y+y0)2 <= 7
-                if((x + circleX)*(x + circleX) + (y + circleY)*(y + circleY) <= AMMUNITION_RADIUS){
+                if((x - circleX)*(x - circleX) + (y - circleY)*(y - circleY) <= radius*radius){
                     gameField.setRGB(x, yTransform(y), color);
                 }
                 
                 ++x;
             }
+            
+            x = circleX - radius;
             --y;
         }
     }
@@ -139,9 +141,9 @@ public class Game {
             while(x <= xTarget){
                 
                 // (x+x0)2 + (y+y0)2 <= 7
-                if((x - circleX)*(x - circleX) + (y - circleY)*(y - circleY) <= AMMUNITION_RADIUS*AMMUNITION_RADIUS){
+                if((x - circleX)*(x - circleX) + (y - circleY)*(y - circleY) <= radius*radius){
 
-                    if(gameField.getRGB(x, y) == 0){  // Black == Fortress impact!!!
+                    if(gameField.getRGB(x, yTransform(y)) == 0){  // Black == Fortress impact!!!
                         return true;
                     }
                     
@@ -150,6 +152,8 @@ public class Game {
                 
                 ++x;
             }
+            
+            x = circleX - radius;
             --y;
         }
         
@@ -214,6 +218,8 @@ public class Game {
             explosionY = ammunitionY;
         } else {
             oldAmmunitionExist = true;
+            oldAmmunitionX = ammunitionX;
+            oldAmmunitionY = ammunitionY;
         }
 
         
