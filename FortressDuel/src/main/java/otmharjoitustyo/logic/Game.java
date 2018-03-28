@@ -105,6 +105,9 @@ public class Game {
     }
     
     private boolean insertCircleWithImpactDetectionOption(int circleX, int circleY, int radius, int color, boolean detectionON){
+        int yMax = gameField.getHeight();
+        int xMax = gameField.getWidth();
+        
         int y = circleY + radius;
         int x = circleX - radius;
         
@@ -115,14 +118,17 @@ public class Game {
         while(y >= yTarget){
             while(x <= xTarget){
                 
-                // (x+x0)2 + (y+y0)2 <= 7
+                // (x-x0)2 + (y-y0)2 <= radius2
                 if((x - circleX)*(x - circleX) + (y - circleY)*(y - circleY) <= radius*radius){
-
-                    if(detectionON && gameField.getRGB(x, yTransform(y)) == 0){  // Black == Fortress impact!!!
-                        return true;
-                    }
                     
-                    gameField.setRGB(x, yTransform(y), color);
+                    // gameField boundary check.        // <= VS <   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    if(0 < x && x < xMax && 0 < y && y < yMax){
+                        
+                        if(detectionON && gameField.getRGB(x, yTransform(y)) == Color.BLACK.getRGB()){  // Black == Fortress impact!!!
+                            return true;
+                        }
+                        gameField.setRGB(x, yTransform(y), color);
+                    }
                 }
                 
                 ++x;
