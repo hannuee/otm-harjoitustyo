@@ -23,6 +23,8 @@ import java.io.IOException;
 
 import javafx.embed.swing.SwingFXUtils;
 
+import javafx.scene.paint.Color;
+
 public class GameGUI extends Application {
     
     BufferedImage gameField;
@@ -48,12 +50,12 @@ public class GameGUI extends Application {
         GraphicsContext pen = canvas.getGraphicsContext2D();
         BorderPane layout = new BorderPane();
         layout.setCenter(canvas);
-        
+   
         
          // Simulaation näyttäminen.
-        new AnimationTimer() {
+        AnimationTimer simulation = new AnimationTimer() {
             
-            long startTime = System.nanoTime();
+            long startTime = -1;
             
             // FPS
             int counter = 0;
@@ -61,8 +63,12 @@ public class GameGUI extends Application {
             
             @Override
             public void handle(long nowTime) {
-                double simulationTime = (nowTime - startTime)/1000000000.0;
+                if(startTime == -1){
+                    startTime = System.nanoTime();
+                }
                 
+                double simulationTime = (nowTime - startTime)/1000000000.0;
+
                 // FPS
                 int simuTime = (int)simulationTime;
                 if(current == simuTime){
@@ -72,17 +78,51 @@ public class GameGUI extends Application {
                     current = simuTime;
                     counter = 1;
                 }
-                
+
                 BufferedImage gameImage = game.getSimulationSnapshot(simulationTime);
                 if(gameImage != null){
                     Image image = SwingFXUtils.toFXImage(gameImage, null);
                     pen.drawImage(image, 0, 0);
                 } else {
-                    game.setAndFireCannon(-50, 50);  // TESTAAMISEEN.
-                    startTime = System.nanoTime();
-                }
+                    startTime = -1;
+                    this.stop();
+                    //game.setAndFireCannon(-200, 5);  // TESTAAMISEEN.
+                    //startTime = System.nanoTime();
+                }                    
+                
             }
-        }.start();
+        };
+        
+        
+
+        canvas.setOnMouseMoved((event) -> {
+            if(game.getState() == 1){
+                Image image = SwingFXUtils.toFXImage(game.getStaticSnapshot(), null);
+                pen.drawImage(image, 0, 0);
+                
+                pen.setStroke(Color.BLACK);
+                // 1 x y  2 x y
+                pen.strokeLine(228, 600 - 238, event.getX(), event.getY());  // 600 - 238:hin joku yTransform.
+            } else if(game.getState() == 3){
+                Image image = SwingFXUtils.toFXImage(game.getStaticSnapshot(), null);
+                pen.drawImage(image, 0, 0);
+                
+                pen.setStroke(Color.BLACK);
+                // 1 x y  2 x y
+                pen.strokeLine(733, 600 - 238, event.getX(), event.getY());  // 600 - 238:hin joku yTransform.
+            }  
+        });
+        
+        canvas.setOnMouseClicked((event) -> {
+            if(game.getState() == 1){
+                game.setAndFireCannon((int)event.getX() - 228, 600 - (int)event.getY() - 238);  // Tähänkin jotkut hienot transformit.
+                simulation.start();
+            } else if(game.getState() == 3){
+                game.setAndFireCannon((int)event.getX() - 733, 600 - (int)event.getY() - 238);  // Tähänkin jotkut hienot transformit.
+                simulation.start();
+            }  
+        });
+        
         
         Scene scene = new Scene(layout);
         

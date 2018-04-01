@@ -3,7 +3,6 @@
  */
 package otmharjoitustyo.logic;
 
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.Color;
 
@@ -59,8 +58,7 @@ public class Game {
         this.rightCannonX = rightCannonX;
         this.rightCannonY = rightCannonY;
         
-        // Testausta varten heti 2.
-        this.state = 2;
+        this.state = 1;
         
         this.oldAmmunitionExist = false;
         this.explosion = false;
@@ -194,6 +192,7 @@ public class Game {
         if(impact){
             // Poistetaan linnapixelit räjähdysalueelta ja samalla ammus:
             insertCircleWithImpactDetectionOption(ammunitionX, ammunitionY, EXPLOSION_RADIUS, Color.WHITE.getRGB(), false);
+            oldAmmunitionExist = false;
             
             nextState();
             
@@ -208,6 +207,10 @@ public class Game {
 
         
         return gameField;
+    }
+    
+    public BufferedImage getStaticSnapshot(){
+        return this.gameField;
     }
     
     public void setAndFireCannon(int initialVx, int initialVy){
