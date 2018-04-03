@@ -9,7 +9,6 @@ import java.awt.Color;
 public class Game {
     
     BufferedImage gameField;
-    private final int groundLevel;
     
     /*
     States:
@@ -47,11 +46,9 @@ public class Game {
     /**
      * 
      * @param gameField Image of the Game Field.
-     * @param groundLevel The height of ground level in pixels from the bottom of the image.
      */
-    public Game(BufferedImage gameField, int groundLevel, int leftCannonX, int leftCannonY, int rightCannonX, int rightCannonY){
+    public Game(BufferedImage gameField, int leftCannonX, int leftCannonY, int rightCannonX, int rightCannonY){
         this.gameField = gameField;
-        this.groundLevel = groundLevel;
         
         this.leftCannonX = leftCannonX;
         this.leftCannonY = leftCannonY;
@@ -128,8 +125,7 @@ public class Game {
                     
                     // gameField boundary check.        // <= VS <   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                     if(0 < x && x < xMax && 0 < y && y < yMax){
-                        
-                        if(detectionON && gameField.getRGB(x, yTransform(y)) == Color.BLACK.getRGB()){  // Black == Fortress impact!!!
+                        if(detectionON && gameField.getRGB(x, yTransform(y)) != Color.WHITE.getRGB()){  // Not white == impact into fortress or ground. 
                             return true;
                         }
                         gameField.setRGB(x, yTransform(y), color);
@@ -173,21 +169,13 @@ public class Game {
             nextState();
             return gameField;
         }
-        
+       
         
         boolean impact = false;
         
-        // Tarkasta osuma maahan:
-        if(ammunitionY < groundLevel + AMMUNITION_RADIUS){
-            impact = true;
-        }
-        
-        if(!impact){
-            // Maahan ei osuttu, tarkastetaan osuma linnoihin samalla kun piirretään ammuksen uutta paikkaa.
-            impact = insertCircleWithImpactDetectionOption(ammunitionX, ammunitionY, AMMUNITION_RADIUS, Color.RED.getRGB(), true);
-        }
-        
-        
+        // Tarkastetaan osuma linnoihin ja maahan samalla kun piirretään ammuksen uutta paikkaa.
+        impact = insertCircleWithImpactDetectionOption(ammunitionX, ammunitionY, AMMUNITION_RADIUS, Color.RED.getRGB(), true);
+
         // Jos osui maahan tai linnaan.
         if(impact){
             // Poistetaan linnapixelit räjähdysalueelta ja samalla ammus:
@@ -205,7 +193,6 @@ public class Game {
             oldAmmunitionY = ammunitionY;
         }
 
-        
         return gameField;
     }
     

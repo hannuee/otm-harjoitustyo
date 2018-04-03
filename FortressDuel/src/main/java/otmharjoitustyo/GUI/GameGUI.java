@@ -38,7 +38,7 @@ public class GameGUI extends Application {
         LevelDao levelDao = new LevelDao(database);
         
         gameField = levelDao.findOne(1).getGameField();
-        game = new Game(gameField, 118, 228, 238, 733, 238);
+        game = new Game(gameField, 228, 238, 733, 238);
     }    
     
     @Override
@@ -86,8 +86,10 @@ public class GameGUI extends Application {
                 } else {
                     startTime = -1;
                     this.stop();
-                    //game.setAndFireCannon(-200, 5);  // TESTAAMISEEN.
-                    //startTime = System.nanoTime();
+                    
+                    // Tänne tarkastus että oliko juuri oikean puolimmaisen vuoro,
+                    // jos oli niin tarkastetaan voittiko jompikumpi vai oliko tasapeli.
+                    // Tai ehkä sittenkin getSimulationSnapshot heti alkuun.
                 }                    
                 
             }
