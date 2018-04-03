@@ -5,6 +5,8 @@ package otmharjoitustyo.GUI;
 
 import otmharjoitustyo.logic.Game;
 
+import otmharjoitustyo.database.*;
+
 import javafx.application.Application;
 import javafx.animation.AnimationTimer;
 
@@ -16,14 +18,14 @@ import javafx.scene.image.Image;
 
 import javafx.scene.layout.BorderPane;
 
-import java.io.File;
 import java.awt.image.BufferedImage;
-import javax.imageio.ImageIO;
 import java.io.IOException;
 
 import javafx.embed.swing.SwingFXUtils;
 
 import javafx.scene.paint.Color;
+
+import java.sql.SQLException;
 
 public class GameGUI extends Application {
     
@@ -31,13 +33,11 @@ public class GameGUI extends Application {
     Game game;
     
     @Override
-    public void init() {
-        gameField = null;
-        try {
-            gameField = ImageIO.read(new File("kenttapohja.png"));
-        } catch (IOException e) {
-        }
+    public void init() throws SQLException, IOException {
+        Database database = new Database("jdbc:sqlite:Gamedata.db");
+        LevelDao levelDao = new LevelDao(database);
         
+        gameField = levelDao.findOne(1).getGameField();
         game = new Game(gameField, 118, 228, 238, 733, 238);
     }    
     
