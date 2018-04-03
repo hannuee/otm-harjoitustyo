@@ -84,12 +84,16 @@ public class GameGUI extends Application {
                     Image image = SwingFXUtils.toFXImage(gameImage, null);
                     pen.drawImage(image, 0, 0);
                 } else {
-                    startTime = -1;
                     this.stop();
+                    startTime = -1;
                     
-                    // Tänne tarkastus että oliko juuri oikean puolimmaisen vuoro,
-                    // jos oli niin tarkastetaan voittiko jompikumpi vai oliko tasapeli.
-                    // Tai ehkä sittenkin getSimulationSnapshot heti alkuun.
+                    // Game over check.
+                    if(game.getState() == 1){
+                        String result = game.checkWinner();
+                        if(result != null){
+                            System.out.println(result); // FOR TESTING!
+                        } 
+                    }
                 }                    
                 
             }

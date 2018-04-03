@@ -12,7 +12,6 @@ public class Game {
     
     /*
     States:
-    0 = Game over.
     1 = Left player's turn.
     2 = Simulating the effects of an ammunition shot by the left player.
     3 = Right player's turn.
@@ -39,10 +38,6 @@ public class Game {
     int explosionX;
     int explosionY;
     
-    // Tarkastetaan törmäykset maahan rajoista?
-    
-    // Törmäykset linnaan erikseen?
-    
     /**
      * 
      * @param gameField Image of the Game Field.
@@ -59,11 +54,6 @@ public class Game {
         
         this.oldAmmunitionExist = false;
         this.explosion = false;
-        
-        
-        // Testausta varten:
-        this.initialVx = 50;
-        this.initialVy = 50;
     }
     
     private void nextState(){
@@ -215,6 +205,43 @@ public class Game {
     
     public int getState(){
         return state;
+    }
+    
+    public String checkWinner(){
+        int blackPixels = 0;
+        int redPixels = 0;
+        
+        int yMax = gameField.getHeight();
+        int xMax = gameField.getWidth();
+        
+        int y = 0;
+        int x = 0;
+        while(y < yMax){
+            while(x < xMax){
+                
+                int pixelColor = gameField.getRGB(x, y);
+                if(pixelColor == Color.BLACK.getRGB()){
+                    ++blackPixels;
+                } else if(pixelColor == Color.RED.getRGB()){
+                    ++redPixels;
+                }
+                
+                ++x;
+            }
+            
+            x = 0;
+            ++y;
+        }
+        
+        if(blackPixels > 0 && redPixels > 0){
+            return null;
+        } else if(blackPixels == 0 && redPixels == 0){
+            return "TIE!";
+        } else if(blackPixels == 0){
+            return "Right player won!";
+        } else {
+            return "Left player won!";
+        }
     }
     
 }
