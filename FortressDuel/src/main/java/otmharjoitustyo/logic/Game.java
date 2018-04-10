@@ -82,6 +82,30 @@ public class Game {
         return (int)positionDueInitialVx + positionDueCannonPosition;
     }
     
+    private int ammunitionXwithDrag(double t){
+        final double a = 0.00019242255;
+        final double v = Math.abs(this.initialVx);
+        final int p;
+        if(state == 2){
+            p = this.leftCannonX;
+        } else {
+            p = this.rightCannonX;
+        }
+        
+        double up1 = a*p;
+        
+        double up2 = Math.log(a*t + 1/v);
+        
+        double up3 = Math.log(1/v);
+        
+        // Differential equation only works with positive v, so when v is actually negative, positive v is used but the equation is flipped.
+        if(0 <= this.initialVx){ 
+            return (int)((up1 + up2 - up3)/a);
+        } else {
+            return (int)((up1 - up2 + up3)/a);
+        }
+    }
+    
     private int ammunitionY(double seconds){
         double positionDueGravity = (-9.81/2.0) * Math.pow(seconds, 2);
         double positionDueInitialVy = this.initialVy * seconds;
@@ -94,6 +118,36 @@ public class Game {
         }
         
         return (int)(positionDueGravity + positionDueInitialVy) + positionDueCannonPosition;
+    }
+    
+    private int ammunitionYwithDrag(double t){
+        final double a = 0.00019242255;
+        final double g = 9.81;
+        
+        final double v = this.initialVy;
+        final int p;
+        if(state == 2){
+            p = this.leftCannonY;
+        } else {
+            p = this.rightCannonY;
+        }
+       
+        
+        double up1;
+        if(0 <= v){
+            up1 = Math.log(Math.cos(
+                Math.sqrt(a)*Math.sqrt(g)*t - Math.acos(Math.sqrt(g)/Math.sqrt(a*v*v+g))));
+        } else {
+            up1 = Math.log(Math.cos(
+                Math.sqrt(a)*Math.sqrt(g)*t + Math.acos(Math.sqrt(g)/Math.sqrt(a*v*v+g))));
+        }
+        
+        double up2 = Math.log(Math.sqrt(g)/Math.sqrt(a*v*v+g));
+        
+        double up3 = a*p;
+        
+        
+        return (int)((up1 - up2 + up3)/a);
     }
     
     private boolean insertCircleWithImpactDetectionOption(int circleX, int circleY, int radius, int color, boolean detectionON){
@@ -150,8 +204,8 @@ public class Game {
         removeOldAmmunitionIfExistent();
         
         // Lasketaan uusi ammuksen sijainti.
-        int ammunitionX = ammunitionX(seconds);
-        int ammunitionY = ammunitionY(seconds);
+        int ammunitionX = ammunitionXwithDrag(seconds);
+        int ammunitionY = ammunitionYwithDrag(seconds);
         
         // Tarkastetaan rajat:
         // jos vas tai oik yli niin palautetaan tyhjä
