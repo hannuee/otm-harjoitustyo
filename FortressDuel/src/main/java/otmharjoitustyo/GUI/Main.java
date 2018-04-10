@@ -4,7 +4,6 @@
 package otmharjoitustyo.GUI;
 
 import otmharjoitustyo.logic.Game;
-
 import otmharjoitustyo.database.*;
 
 import javafx.application.Application;
@@ -27,7 +26,7 @@ import javafx.scene.paint.Color;
 
 import java.sql.SQLException;
 
-public class GameGUI extends Application {
+public class Main extends Application {
     
     BufferedImage gameField;
     Game game;
@@ -137,7 +136,7 @@ public class GameGUI extends Application {
     }
     
     public static void main(String[] args) {
-        launch(GameGUI.class);
+        launch(Main.class);
     }
     
 }
