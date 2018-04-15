@@ -4,6 +4,7 @@
 package otmharjoitustyo.GUI;
 
 import otmharjoitustyo.logic.Game;
+import otmharjoitustyo.domain.Level;
 import otmharjoitustyo.database.*;
 
 import javafx.application.Application;
@@ -26,22 +27,32 @@ import javafx.scene.paint.Color;
 
 import java.sql.SQLException;
 
+// Game selection scene
+import javafx.geometry.Insets;
+import javafx.scene.control.Button;
+import javafx.scene.layout.VBox;
+import java.util.ArrayList;
+
 public class Main extends Application {
+    
+    Database database;
+    LevelDao levelDao;
     
     BufferedImage gameField;
     Game game;
     
-    @Override
-    public void init() throws SQLException, IOException {
-        Database database = new Database("jdbc:sqlite:Gamedata.db");
-        LevelDao levelDao = new LevelDao(database);
-        
-        gameField = levelDao.findOne(1).getGameField();
-        game = new Game(gameField, 228, 238, 733, 238);
-    }    
+    Scene selectionScene;
+    Scene gameScene;
+    
+    Stage stage;
     
     @Override
-    public void start(Stage stage){
+    public void init() throws SQLException, IOException {
+        database = new Database("jdbc:sqlite:Gamedata.db");
+        levelDao = new LevelDao(database);
+    }
+
+    private void buildGameScene(){
         final int width = gameField.getWidth();
         final int height = gameField.getHeight();
         
@@ -50,8 +61,7 @@ public class Main extends Application {
         BorderPane layout = new BorderPane();
         layout.setCenter(canvas);
    
-        
-         // Simulaation näyttäminen.
+        // Simulaation näyttäminen.
         AnimationTimer simulation = new AnimationTimer() {
             
             long startTime = -1;
@@ -90,7 +100,8 @@ public class Main extends Application {
                     if(game.getState() == 1){
                         String result = game.checkWinner();
                         if(result != null){
-                            System.out.println(result); // FOR TESTING!
+                            System.out.println(result); // FOR TESTING!!!!!!!!!!!!!!!!!!!!!!!!!!
+                            stage.setScene(selectionScene);
                         } 
                     }
                 }                    
@@ -98,8 +109,6 @@ public class Main extends Application {
             }
         };
         
-        
-
         canvas.setOnMouseMoved((event) -> {
             if(game.getState() == 1){
                 Image image = SwingFXUtils.toFXImage(game.getStaticSnapshot(), null);
@@ -125,13 +134,45 @@ public class Main extends Application {
             } else if(game.getState() == 3){
                 game.setAndFireCannon((int)event.getX() - 733, 600 - (int)event.getY() - 238);  // Tähänkin jotkut hienot transformit.
                 simulation.start();
-            }  
+            }
         });
         
+        gameScene = new Scene(layout);
+    }
+    
+    private void buildSelectionScene() throws SQLException, IOException{
+        VBox vbox = new VBox();
+        vbox.setPrefSize(300, 180);
+        vbox.setSpacing(10);
+        vbox.setPadding(new Insets(30, 30, 30, 30));
         
-        Scene scene = new Scene(layout);
+        ArrayList<Level> levels = levelDao.listAll();
+        for(Level level : levels){
+            Button levelButton = new Button(level.getName());
+            levelButton.setOnAction((event) -> {
+                try{
+                    gameField = levelDao.findOne(level.getId()).getGameField();
+                    game = new Game(gameField, 228, 238, 733, 238);
+                } catch(Exception e){
+                    System.out.println("Error while loading the level!");  // MUUTA GRAAFISEKS?!?!?!?!?!
+                }
+
+                buildGameScene();
+                stage.setScene(gameScene);
+            });
+            vbox.getChildren().add(levelButton);
+        }
         
-        stage.setScene(scene);
+        selectionScene = new Scene(vbox);
+    }
+    
+    @Override
+    public void start(Stage stage) throws SQLException, IOException{
+        this.stage = stage;
+
+        buildSelectionScene();
+      
+        stage.setScene(selectionScene);
         stage.show();
     }
     

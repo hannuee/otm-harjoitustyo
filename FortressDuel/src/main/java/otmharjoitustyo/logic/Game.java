@@ -20,7 +20,7 @@ public class Game {
     int state;
     
     private static final int AMMUNITION_RADIUS = 7;
-    private static final int EXPLOSION_RADIUS = 14;
+    private static final int EXPLOSION_RADIUS = 50;
    
     int leftCannonX;
     int leftCannonY;

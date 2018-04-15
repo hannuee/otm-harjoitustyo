@@ -5,6 +5,8 @@ package otmharjoitustyo.database;
 
 import otmharjoitustyo.domain.Level;
 
+import java.util.ArrayList;
+
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import java.io.IOException;
@@ -48,6 +50,29 @@ public class LevelDao {
             
             return null;
         }
+    }
+    
+    // return a list with only ids and names.
+    public ArrayList<Level> listAll() throws SQLException, IOException {
+        Connection connection = this.database.getConnection();
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM Level");
+        
+        ResultSet result = statement.executeQuery();
+        
+        ArrayList<Level> levels = new ArrayList<>();
+        
+        while(result.next()){
+            int id = result.getInt("id");
+            String name = result.getString("name");
+            
+            levels.add(new Level(id, name, null));
+        } 
+            
+        result.close();
+        statement.close();
+        connection.close();
+        
+        return levels;
     }
     
 }
