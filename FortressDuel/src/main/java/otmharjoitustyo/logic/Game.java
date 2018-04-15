@@ -193,8 +193,6 @@ public class Game {
         }
     }
     
-    // GUIn tulisi käyttää ennen jokaista käyttöä statea.
-    // GUIn tulisi kysyä jokaisen metodin käytön jälkeen räjähdystä.
     public BufferedImage getSimulationSnapshot(double seconds){
         if(state != 2 && state != 4){
             return null;

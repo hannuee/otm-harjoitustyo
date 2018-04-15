@@ -4,7 +4,7 @@
 package otmharjoitustyo.GUI;
 
 import otmharjoitustyo.logic.Game;
-import otmharjoitustyo.domain.Level;
+import otmharjoitustyo.domain.*;
 import otmharjoitustyo.database.*;
 
 import javafx.application.Application;
@@ -33,16 +33,23 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 import java.util.ArrayList;
 
+// Name entry scene
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+
 public class Main extends Application {
     
     Database database;
     LevelDao levelDao;
+    PlayerDao playerDao;
+    
+    ArrayList<Player> players;
     
     BufferedImage gameField;
     Game game;
     
-    Scene selectionScene;
-    Scene gameScene;
+    Player leftPlayer;
+    Player rightPlayer;
     
     Stage stage;
     
@@ -50,9 +57,10 @@ public class Main extends Application {
     public void init() throws SQLException, IOException {
         database = new Database("jdbc:sqlite:Gamedata.db");
         levelDao = new LevelDao(database);
+        playerDao = new PlayerDao(database);
     }
 
-    private void buildGameScene(){
+    private void buildAndSetGameScene(){
         final int width = gameField.getWidth();
         final int height = gameField.getHeight();
         
@@ -71,7 +79,7 @@ public class Main extends Application {
             int current = 0;
             
             @Override
-            public void handle(long nowTime) {
+            public void handle(long nowTime){
                 if(startTime == -1){
                     startTime = System.nanoTime();
                 }
@@ -101,7 +109,12 @@ public class Main extends Application {
                         String result = game.checkWinner();
                         if(result != null){
                             System.out.println(result); // FOR TESTING!!!!!!!!!!!!!!!!!!!!!!!!!!
-                            stage.setScene(selectionScene);
+                            try{
+                                buildAndSetSelectionScene();
+                            } catch(Exception e){
+                                // ERROR?!?!?!?!?!?????????????????????
+                            }
+                            
                         } 
                     }
                 }                    
@@ -137,10 +150,58 @@ public class Main extends Application {
             }
         });
         
-        gameScene = new Scene(layout);
+        Scene gameScene = new Scene(layout);
+        stage.setScene(gameScene);
     }
     
-    private void buildSelectionScene() throws SQLException, IOException{
+    private void buildAndSetNameEntryScene(Level level) {
+        Label leftSideLabel = new Label("Nickname of the player on the left side:");
+        TextField leftSideNickname = new TextField();
+        leftSideNickname.setMaxWidth(220.00);
+        
+        Label rightSideLabel = new Label("Nickname of the player on the right side:");
+        TextField rightSideNickname = new TextField();
+        rightSideNickname.setMaxWidth(220.00);
+        
+        Button startButton = new Button("Start The Game!");
+        startButton.setOnAction((event) -> {
+            try{
+                gameField = levelDao.findOne(level.getId()).getGameField();
+                game = new Game(gameField, 228, 238, 733, 238);
+            } catch(Exception e){
+                System.out.println("Error while loading the level!");  // MUUTA GRAAFISEKS?!?!?!?!?!
+            }
+            
+            String leftPlayerNickname = leftSideNickname.getText();   // TARKASTA ETTÄ EI OLE SAMA NIMI!!!!!!!!!
+            String rightPlayerNickname = rightSideNickname.getText(); 
+            leftPlayer = null;
+            rightPlayer = null;
+            for(Player player : players){
+                if(player.getName().equals(leftPlayerNickname)){
+                    leftPlayer = player;
+                } else if(player.getName().equals(rightPlayerNickname)){
+                    rightPlayer = player;
+                }
+            }
+
+            buildAndSetGameScene();
+        });
+        
+        VBox vbox = new VBox();
+        vbox.setPrefSize(300, 180);
+        vbox.setSpacing(10);
+        vbox.setPadding(new Insets(30, 30, 30, 30));
+        vbox.getChildren().add(leftSideLabel);
+        vbox.getChildren().add(leftSideNickname);
+        vbox.getChildren().add(rightSideLabel);
+        vbox.getChildren().add(rightSideNickname);
+        vbox.getChildren().add(startButton);
+        
+        Scene nameEntryScene = new Scene(vbox);
+        stage.setScene(nameEntryScene);
+    }
+    
+    private void buildAndSetSelectionScene() throws SQLException, IOException{
         VBox vbox = new VBox();
         vbox.setPrefSize(300, 180);
         vbox.setSpacing(10);
@@ -148,31 +209,26 @@ public class Main extends Application {
         
         ArrayList<Level> levels = levelDao.listAll();
         for(Level level : levels){
+            
             Button levelButton = new Button(level.getName());
             levelButton.setOnAction((event) -> {
-                try{
-                    gameField = levelDao.findOne(level.getId()).getGameField();
-                    game = new Game(gameField, 228, 238, 733, 238);
-                } catch(Exception e){
-                    System.out.println("Error while loading the level!");  // MUUTA GRAAFISEKS?!?!?!?!?!
-                }
-
-                buildGameScene();
-                stage.setScene(gameScene);
+                buildAndSetNameEntryScene(level);
             });
             vbox.getChildren().add(levelButton);
         }
         
-        selectionScene = new Scene(vbox);
+        players = playerDao.findAll();  // FUNTSI!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        
+        Scene selectionScene = new Scene(vbox);
+        stage.setScene(selectionScene);
     }
     
     @Override
     public void start(Stage stage) throws SQLException, IOException{
         this.stage = stage;
 
-        buildSelectionScene();
+        buildAndSetSelectionScene();
       
-        stage.setScene(selectionScene);
         stage.show();
     }
     
