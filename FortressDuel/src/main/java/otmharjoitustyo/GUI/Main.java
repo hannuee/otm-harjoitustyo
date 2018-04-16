@@ -141,6 +141,7 @@ public class Main extends Application {
             }
         };
         
+        // Drawing of the cannon aiming vectors.         
         canvas.setOnMouseMoved((event) -> {
             if(game.getState() == 1){
                 Image image = SwingFXUtils.toFXImage(game.getStaticSnapshot(), null);
@@ -148,7 +149,7 @@ public class Main extends Application {
                 
                 pen.setStroke(Color.BLACK);
                 // 1 x y  2 x y
-                pen.strokeLine(228, 600 - 238, event.getX(), event.getY());  // 600 - 238:hin joku yTransform.
+                pen.strokeLine(228, 600 - 238, event.getX(), event.getY());  // 600 - 238:hin joku yTransform JA tykin sijainti levelistä!!!! 
             } else if(game.getState() == 3){
                 Image image = SwingFXUtils.toFXImage(game.getStaticSnapshot(), null);
                 pen.drawImage(image, 0, 0);
@@ -159,6 +160,7 @@ public class Main extends Application {
             }  
         });
         
+        // Firing of the cannons.
         canvas.setOnMouseClicked((event) -> {
             if(game.getState() == 1){
                 game.setAndFireCannon((int)event.getX() - 228, 600 - (int)event.getY() - 238);  // Tähänkin jotkut hienot transformit.

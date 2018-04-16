@@ -98,9 +98,13 @@ public class Game {
         
         double up3 = Math.log(1/v);
         
-        // Differential equation only works with positive v, so when v is actually negative, positive v is used but the equation is flipped.
-        if(0 <= this.initialVx){ 
+        // The solution used for the differential equation only works with positive v,
+        // so when v is negative, positive v is used but the solution outcome is mirrored,
+        // and when v is zero, the x-position of the ammunition stays the same as the cannon's x-position.
+        if(0 < this.initialVx){ 
             return (int)((up1 + up2 - up3)/a);
+        } else if(this.initialVx == 0){
+            return p;
         } else {
             return (int)((up1 - up2 + up3)/a);
         }
