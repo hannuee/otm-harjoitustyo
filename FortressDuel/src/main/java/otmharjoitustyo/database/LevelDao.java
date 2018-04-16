@@ -20,7 +20,7 @@ public class LevelDao {
     
     private final Database database;
     
-    public LevelDao(Database database){
+    public LevelDao(Database database) {
         this.database = database;
     }
    
@@ -31,7 +31,7 @@ public class LevelDao {
         
         ResultSet result = statement.executeQuery();
         
-        if(result.next()){
+        if (result.next()) {
             
             BufferedImage gameField = ImageIO.read(result.getBinaryStream("gamefield"));
             
@@ -60,7 +60,7 @@ public class LevelDao {
         
         ArrayList<Level> levels = new ArrayList<>();
         
-        while(result.next()){
+        while (result.next()) {
             String name = result.getString("name");
             
             levels.add(new Level(name, null));

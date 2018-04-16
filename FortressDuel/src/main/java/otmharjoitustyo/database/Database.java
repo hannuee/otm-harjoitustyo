@@ -11,7 +11,7 @@ public class Database {
     
     private final String address;
     
-    public Database(String address){
+    public Database(String address) {
         this.address = address;
     }
     

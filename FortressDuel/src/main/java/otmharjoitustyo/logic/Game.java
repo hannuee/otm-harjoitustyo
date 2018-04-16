@@ -42,7 +42,7 @@ public class Game {
      * 
      * @param gameField Image of the Game Field.
      */
-    public Game(BufferedImage gameField, int leftCannonX, int leftCannonY, int rightCannonX, int rightCannonY){
+    public Game(BufferedImage gameField, int leftCannonX, int leftCannonY, int rightCannonX, int rightCannonY) {
         this.gameField = gameField;
         
         this.leftCannonX = leftCannonX;
@@ -56,81 +56,81 @@ public class Game {
         this.explosion = false;
     }
     
-    private void nextState(){
+    private void nextState() {
         ++state;
-        if(state == 5){
+        if (state == 5) {
             state = 1;
         }
     }
     
     // From normal to image coordinates
-    private int yTransform(int y){
+    private int yTransform(int y) {
         return this.gameField.getHeight() - y;
     }
     
     
-    private int ammunitionX(double seconds){
+    public int ammunitionX(double seconds) { // public for testing, otherwise private.
         double positionDueInitialVx = this.initialVx * seconds;
         
         int positionDueCannonPosition;
-        if(state == 2){
+        if (state == 2) {
             positionDueCannonPosition = this.leftCannonX;
         } else {
             positionDueCannonPosition = this.rightCannonX;
         }
         
-        return (int)positionDueInitialVx + positionDueCannonPosition;
+        return (int) positionDueInitialVx + positionDueCannonPosition;
     }
     
-    private int ammunitionXwithDrag(double t){
+    public int ammunitionXwithDrag(double t) {  // public for testing, otherwise private.
         final double a = 0.00019242255;
         final double v = Math.abs(this.initialVx);
         final int p;
-        if(state == 2){
+        if (state == 2) {
             p = this.leftCannonX;
         } else {
             p = this.rightCannonX;
         }
         
-        double up1 = a*p;
+        double up1 = a * p;
         
-        double up2 = Math.log(a*t + 1/v);
+        double up2 = Math.log(a * t + 1 / v);
         
-        double up3 = Math.log(1/v);
+        double up3 = Math.log(1 / v);
         
         // The solution used for the differential equation only works with positive v,
         // so when v is negative, positive v is used but the solution outcome is mirrored,
         // and when v is zero, the x-position of the ammunition stays the same as the cannon's x-position.
-        if(0 < this.initialVx){ 
-            return (int)((up1 + up2 - up3)/a);
-        } else if(this.initialVx == 0){
+        if (0 < this.initialVx) { 
+            return (int) ((up1 + up2 - up3) / a);
+        } else if (this.initialVx == 0) {
             return p;
         } else {
-            return (int)((up1 - up2 + up3)/a);
+            return (int) ((up1 - up2 + up3) / a);
         }
     }
     
-    private int ammunitionY(double seconds){
-        double positionDueGravity = (-9.81/2.0) * Math.pow(seconds, 2);
+    public int ammunitionY(double seconds) {  // public for testing, otherwise private.
+        double positionDueGravity = (-9.81 / 2.0) * Math.pow(seconds, 2);
         double positionDueInitialVy = this.initialVy * seconds;
         
         int positionDueCannonPosition;
-        if(state == 2){
+        if (state == 2) {
             positionDueCannonPosition = this.leftCannonY;
         } else {
             positionDueCannonPosition = this.rightCannonY;
         }
         
-        return (int)(positionDueGravity + positionDueInitialVy) + positionDueCannonPosition;
+        return (int) (positionDueGravity + positionDueInitialVy) + positionDueCannonPosition;
     }
     
-    private int ammunitionYwithDrag(double t){
+    public int ammunitionYwithDrag(double t) {  // public for testing, otherwise private.
         final double a = 0.00019242255;
         final double g = 9.81;
         
         final double v = this.initialVy;
         final int p;
-        if(state == 2){
+        if (state == 2) {
             p = this.leftCannonY;
         } else {
             p = this.rightCannonY;
@@ -138,23 +138,23 @@ public class Game {
        
         
         double up1;
-        if(0 <= v){
+        if (0 <= v) {
             up1 = Math.log(Math.cos(
-                Math.sqrt(a)*Math.sqrt(g)*t - Math.acos(Math.sqrt(g)/Math.sqrt(a*v*v+g))));
+                Math.sqrt(a) * Math.sqrt(g) * t - Math.acos(Math.sqrt(g) / Math.sqrt(a * v * v + g))));
         } else {
             up1 = Math.log(Math.cos(
-                Math.sqrt(a)*Math.sqrt(g)*t + Math.acos(Math.sqrt(g)/Math.sqrt(a*v*v+g))));
+                Math.sqrt(a) * Math.sqrt(g) * t + Math.acos(Math.sqrt(g) / Math.sqrt(a * v * v + g))));
         }
         
-        double up2 = Math.log(Math.sqrt(g)/Math.sqrt(a*v*v+g));
+        double up2 = Math.log(Math.sqrt(g) / Math.sqrt(a * v * v + g));
         
-        double up3 = a*p;
+        double up3 = a * p;
         
         
-        return (int)((up1 - up2 + up3)/a);
+        return (int) ((up1 - up2 + up3) / a);
     }
     
-    private boolean insertCircleWithImpactDetectionOption(int circleX, int circleY, int radius, int color, boolean detectionON){
+    private boolean insertCircleWithImpactDetectionOption(int circleX, int circleY, int radius, int color, boolean detectionON) {
         int yMax = gameField.getHeight();
         int xMax = gameField.getWidth();
         
@@ -165,15 +165,15 @@ public class Game {
         int xTarget = x + 2 * radius;
         
         // Loops which go through a rectangle pixel by pixel that will hold the circle to be drawn.
-        while(y >= yTarget){
-            while(x <= xTarget){
+        while (y >= yTarget) {
+            while (x <= xTarget) {
                 
                 // (x-x0)2 + (y-y0)2 <= radius2
-                if((x - circleX)*(x - circleX) + (y - circleY)*(y - circleY) <= radius*radius){
+                if ((x - circleX) * (x - circleX) + (y - circleY) * (y - circleY) <= radius * radius) {
                     
                     // gameField boundary check.        // <= VS <   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                    if(0 < x && x < xMax && 0 < y && y < yMax){
-                        if(detectionON && gameField.getRGB(x, yTransform(y)) != Color.WHITE.getRGB()){  // Not white == impact into fortress or ground. 
+                    if (0 < x && x < xMax && 0 < y && y < yMax) {
+                        if (detectionON && gameField.getRGB(x, yTransform(y)) != Color.WHITE.getRGB()) {  // Not white == impact into fortress or ground. 
                             return true;
                         }
                         gameField.setRGB(x, yTransform(y), color);
@@ -190,15 +190,15 @@ public class Game {
         return false;  // No impact detected or impact detection not turned on.
     }
     
-    private void removeOldAmmunitionIfExistent(){
-        if(oldAmmunitionExist){
+    private void removeOldAmmunitionIfExistent() {
+        if (oldAmmunitionExist) {
             insertCircleWithImpactDetectionOption(oldAmmunitionX, oldAmmunitionY, AMMUNITION_RADIUS, Color.WHITE.getRGB(), false);
             oldAmmunitionExist = false;
         }
     }
     
-    public BufferedImage getSimulationSnapshot(double seconds){
-        if(state != 2 && state != 4){
+    public BufferedImage getSimulationSnapshot(double seconds) {
+        if (state != 2 && state != 4) {
             return null;
         }
         
@@ -211,7 +211,7 @@ public class Game {
         
         // Tarkastetaan rajat:
         // jos vas tai oik yli niin palautetaan tyhjä
-        if(ammunitionX < -AMMUNITION_RADIUS || gameField.getWidth() + AMMUNITION_RADIUS < ammunitionX){
+        if (ammunitionX < -AMMUNITION_RADIUS || gameField.getWidth() + AMMUNITION_RADIUS < ammunitionX) {
             nextState();
             return gameField;
         }
@@ -223,7 +223,7 @@ public class Game {
         impact = insertCircleWithImpactDetectionOption(ammunitionX, ammunitionY, AMMUNITION_RADIUS, Color.RED.getRGB(), true);
 
         // Jos osui maahan tai linnaan.
-        if(impact){
+        if (impact) {
             // Poistetaan linnapixelit räjähdysalueelta ja samalla ammus:
             insertCircleWithImpactDetectionOption(ammunitionX, ammunitionY, EXPLOSION_RADIUS, Color.WHITE.getRGB(), false);
             oldAmmunitionExist = false;
@@ -242,28 +242,28 @@ public class Game {
         return gameField;
     }
     
-    public BufferedImage getStaticSnapshot(){
+    public BufferedImage getStaticSnapshot() {
         return this.gameField;
     }
     
-    public void setAndFireCannon(int initialVx, int initialVy){
+    public void setAndFireCannon(int initialVx, int initialVy) {
         this.initialVx = initialVx;
         this.initialVy = initialVy;
         nextState();
     }
     
-    public int[] explosionCoordinates(){
-        if(explosion){
+    public int[] explosionCoordinates() {
+        if (explosion) {
             return new int[]{explosionX, explosionY};
         }
         return null;
     }
     
-    public int getState(){
+    public int getState() {
         return state;
     }
     
-    public String checkWinner(){
+    public String checkWinner() {
         int blackPixels = 0;
         int redPixels = 0;
         
@@ -272,13 +272,13 @@ public class Game {
         
         int y = 0;
         int x = 0;
-        while(y < yMax){
-            while(x < xMax){
+        while (y < yMax) {
+            while (x < xMax) {
                 
                 int pixelColor = gameField.getRGB(x, y);
-                if(pixelColor == Color.BLACK.getRGB()){
+                if (pixelColor == Color.BLACK.getRGB()) {
                     ++blackPixels;
-                } else if(pixelColor == Color.RED.getRGB()){
+                } else if (pixelColor == Color.RED.getRGB()) {
                     ++redPixels;
                 }
                 
@@ -289,11 +289,11 @@ public class Game {
             ++y;
         }
         
-        if(blackPixels > 0 && redPixels > 0){
+        if (blackPixels > 0 && redPixels > 0) {
             return null;
-        } else if(blackPixels == 0 && redPixels == 0){
+        } else if (blackPixels == 0 && redPixels == 0) {
             return "TIE!";
-        } else if(blackPixels == 0){
+        } else if (blackPixels == 0) {
             return "Right player won!";
         } else {
             return "Left player won!";

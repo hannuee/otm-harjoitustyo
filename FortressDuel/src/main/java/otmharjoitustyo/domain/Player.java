@@ -10,38 +10,38 @@ public class Player {
     private int ties;
     private int losses;
     
-    public Player(String name, int wins, int ties, int losses){
+    public Player(String name, int wins, int ties, int losses) {
         this.name = name;
         this.wins = wins;
         this.ties = ties;
         this.losses = losses;
     }
     
-    public String getName(){
+    public String getName() {
         return this.name;
     }
     
-    public int getWins(){
+    public int getWins() {
         return this.wins;
     }
     
-    public int getTies(){
+    public int getTies() {
         return this.ties;
     }
     
-    public int getLosses(){
+    public int getLosses() {
         return this.losses;
     }
     
-    public void addWin(){
+    public void addWin() {
         ++this.wins;
     }
     
-    public void addTie(){
+    public void addTie() {
         ++this.ties;
     }
     
-    public void addLoss(){
+    public void addLoss() {
         ++this.losses;
     }
     

@@ -10,16 +10,16 @@ public class Level {
     private String name;
     private BufferedImage gameField;
     
-    public Level(String name, BufferedImage gameField){
+    public Level(String name, BufferedImage gameField) {
         this.name = name;
         this.gameField = gameField;
     }
     
-    public String getName(){
+    public String getName() {
         return this.name;
     }
     
-    public BufferedImage getGameField(){
+    public BufferedImage getGameField() {
         return this.gameField;
     }
     

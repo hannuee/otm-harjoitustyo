@@ -16,7 +16,7 @@ public class PlayerDao {
     
     private final Database database;
     
-    public PlayerDao(Database database){
+    public PlayerDao(Database database) {
         this.database = database;
     }
     
@@ -27,7 +27,7 @@ public class PlayerDao {
         
         ResultSet result = statement.executeQuery();
         
-        if(result.next()){
+        if (result.next()) {
             int wins = result.getInt("wins");
             int ties = result.getInt("ties");
             int losses = result.getInt("losses");
@@ -56,7 +56,7 @@ public class PlayerDao {
         
         ArrayList<Player> players = new ArrayList<>();
         
-        while(result.next()){
+        while (result.next()) {
             String name = result.getString("name");
             int wins = result.getInt("wins");
             int ties = result.getInt("ties");
