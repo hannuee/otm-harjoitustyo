@@ -5,26 +5,16 @@ package otmharjoitustyo.domain;
 
 public class Player {
     
-    private int id;
     private String name;
     private int wins;
     private int ties;
     private int losses;
     
-    public Player(int id, String name, int wins, int ties, int losses){
-        this.id = id;
+    public Player(String name, int wins, int ties, int losses){
         this.name = name;
         this.wins = wins;
         this.ties = ties;
         this.losses = losses;
-    }
-    
-    public int getId(){
-        return this.id;
-    }
-    
-    public void setId(int id){
-        this.id = id;
     }
     
     public String getName(){
@@ -41,6 +31,18 @@ public class Player {
     
     public int getLosses(){
         return this.losses;
+    }
+    
+    public void addWin(){
+        ++this.wins;
+    }
+    
+    public void addTie(){
+        ++this.ties;
+    }
+    
+    public void addLoss(){
+        ++this.losses;
     }
     
 }

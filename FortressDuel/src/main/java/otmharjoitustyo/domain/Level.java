@@ -7,18 +7,12 @@ import java.awt.image.BufferedImage;
 
 public class Level {
     
-    private int id;
     private String name;
     private BufferedImage gameField;
     
-    public Level(int id, String name, BufferedImage gameField){
-        this.id = id;
+    public Level(String name, BufferedImage gameField){
         this.name = name;
         this.gameField = gameField;
-    }
-    
-    public int getId(){
-        return this.id;
     }
     
     public String getName(){

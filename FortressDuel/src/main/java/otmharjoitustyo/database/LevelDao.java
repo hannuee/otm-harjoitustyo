@@ -24,23 +24,22 @@ public class LevelDao {
         this.database = database;
     }
    
-    public Level findOne(int id) throws SQLException, IOException {
+    public Level findOne(String name) throws SQLException, IOException {
         Connection connection = this.database.getConnection();
-        PreparedStatement statement = connection.prepareStatement("SELECT * FROM Level WHERE id = ?");
-        statement.setInt(1, id);
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM Level WHERE name = ?");
+        statement.setString(1, name);
         
         ResultSet result = statement.executeQuery();
         
         if(result.next()){
             
-            String name = result.getString("name");
             BufferedImage gameField = ImageIO.read(result.getBinaryStream("gamefield"));
             
             result.close();
             statement.close();
             connection.close();
             
-            return new Level(id, name, gameField);
+            return new Level(name, gameField);
             
         } else {
             
@@ -52,7 +51,7 @@ public class LevelDao {
         }
     }
     
-    // return a list with only ids and names.
+    // return a list with only names.
     public ArrayList<Level> listAll() throws SQLException, IOException {
         Connection connection = this.database.getConnection();
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM Level");
@@ -62,10 +61,9 @@ public class LevelDao {
         ArrayList<Level> levels = new ArrayList<>();
         
         while(result.next()){
-            int id = result.getInt("id");
             String name = result.getString("name");
             
-            levels.add(new Level(id, name, null));
+            levels.add(new Level(name, null));
         } 
             
         result.close();

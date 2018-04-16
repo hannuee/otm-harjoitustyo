@@ -20,6 +20,34 @@ public class PlayerDao {
         this.database = database;
     }
     
+    public Player findOne(String name) throws SQLException {
+        Connection connection = this.database.getConnection();
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM Player WHERE name = ?");
+        statement.setString(1, name);
+        
+        ResultSet result = statement.executeQuery();
+        
+        if(result.next()){
+            int wins = result.getInt("wins");
+            int ties = result.getInt("ties");
+            int losses = result.getInt("losses");
+            
+            result.close();
+            statement.close();
+            connection.close();
+            
+            return new Player(name, wins, ties, losses);
+            
+        } else {
+            
+            result.close();
+            statement.close();
+            connection.close();
+            
+            return null;
+        }
+    }
+    
     public ArrayList<Player> findAll() throws SQLException {
         Connection connection = this.database.getConnection();
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM Player");
@@ -29,13 +57,12 @@ public class PlayerDao {
         ArrayList<Player> players = new ArrayList<>();
         
         while(result.next()){
-            int id = result.getInt("id");
             String name = result.getString("name");
             int wins = result.getInt("wins");
             int ties = result.getInt("ties");
             int losses = result.getInt("losses");
             
-            players.add(new Player(id, name, wins, ties, losses));
+            players.add(new Player(name, wins, ties, losses));
         } 
             
         result.close();
@@ -45,52 +72,34 @@ public class PlayerDao {
         return players;
     }
     
-    public boolean add(Player player) throws SQLException {
+    public void add(Player player) throws SQLException {
         Connection connection = this.database.getConnection();
         PreparedStatement statement = connection.prepareStatement(
-                "INSERT INTO Player(name, wins, ties, losses) values (?, ?, ?, ?) RETURNING id");
+                "INSERT INTO Player(name, wins, ties, losses) values (?, ?, ?, ?)");
         statement.setString(1, player.getName());
         statement.setInt(2, player.getWins());
         statement.setInt(3, player.getTies());
         statement.setInt(4, player.getLosses());
-        
-        ResultSet result = statement.executeQuery();
-        
-        if(result.next()){
-            int id = result.getInt("id");
-            player.setId(id);
-            
-            result.close();
-            statement.close();
-            connection.close();
-            
-            return true;
-
-        } else {
-            result.close();
-            statement.close();
-            connection.close();
-            
-            return false;
-        }
-    }
-    
-    public boolean update(Player player) throws SQLException {
-        Connection connection = this.database.getConnection();
-        PreparedStatement statement = connection.prepareStatement(
-                "UPDATE Player SET name = ?, wins = ?, ties = ?, losses = ? WHERE id = ?");
-        statement.setString(1, player.getName());
-        statement.setInt(2, player.getWins());
-        statement.setInt(3, player.getTies());
-        statement.setInt(4, player.getLosses());
-        statement.setInt(5, player.getId());
         
         statement.executeUpdate();
         
         statement.close();
         connection.close();
+    }
+    
+    public void update(Player player) throws SQLException {
+        Connection connection = this.database.getConnection();
+        PreparedStatement statement = connection.prepareStatement(
+                "UPDATE Player SET wins = ?, ties = ?, losses = ? WHERE name = ?");
+        statement.setInt(1, player.getWins());
+        statement.setInt(2, player.getTies());
+        statement.setInt(3, player.getLosses());
+        statement.setString(4, player.getName());
         
-        return true;
+        statement.executeUpdate();
+        
+        statement.close();
+        connection.close();
     }
     
 }

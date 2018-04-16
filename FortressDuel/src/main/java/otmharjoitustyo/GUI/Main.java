@@ -109,10 +109,29 @@ public class Main extends Application {
                         String result = game.checkWinner();
                         if(result != null){
                             System.out.println(result); // FOR TESTING!!!!!!!!!!!!!!!!!!!!!!!!!!
+                            
+                            if(result.equals("TIE!")){
+                                leftPlayer.addTie();
+                                rightPlayer.addTie();
+                            } else if(result.equals("Right player won!")){
+                                leftPlayer.addLoss();
+                                rightPlayer.addWin();
+                            } else {  // Left won
+                                leftPlayer.addWin();
+                                rightPlayer.addLoss();
+                            }
+                            
+                            try{
+                                playerDao.update(leftPlayer);
+                                playerDao.update(rightPlayer);
+                            } catch(Exception e){
+                                System.out.println("ERROR1");// ERROR?!?!?!?!?!?????????????????????
+                            }
+                            
                             try{
                                 buildAndSetSelectionScene();
                             } catch(Exception e){
-                                // ERROR?!?!?!?!?!?????????????????????
+                                System.out.println("ERROR2");// ERROR?!?!?!?!?!?????????????????????
                             }
                             
                         } 
@@ -166,24 +185,31 @@ public class Main extends Application {
         Button startButton = new Button("Start The Game!");
         startButton.setOnAction((event) -> {
             try{
-                gameField = levelDao.findOne(level.getId()).getGameField();
+                gameField = levelDao.findOne(level.getName()).getGameField();
                 game = new Game(gameField, 228, 238, 733, 238);
             } catch(Exception e){
                 System.out.println("Error while loading the level!");  // MUUTA GRAAFISEKS?!?!?!?!?!
             }
             
+            
             String leftPlayerNickname = leftSideNickname.getText();   // TARKASTA ETTÄ EI OLE SAMA NIMI!!!!!!!!!
             String rightPlayerNickname = rightSideNickname.getText(); 
-            leftPlayer = null;
-            rightPlayer = null;
-            for(Player player : players){
-                if(player.getName().equals(leftPlayerNickname)){
-                    leftPlayer = player;
-                } else if(player.getName().equals(rightPlayerNickname)){
-                    rightPlayer = player;
+            try{
+                leftPlayer = playerDao.findOne(leftPlayerNickname);
+                rightPlayer = playerDao.findOne(rightPlayerNickname);
+                
+                if(leftPlayer == null){
+                    leftPlayer = new Player(leftPlayerNickname, 0, 0, 0);
+                    playerDao.add(leftPlayer);
                 }
+                if(rightPlayer == null){
+                    rightPlayer = new Player(rightPlayerNickname, 0, 0, 0);
+                    playerDao.add(rightPlayer);
+                }
+                
+            } catch(Exception e){   
             }
-
+            
             buildAndSetGameScene();
         });
         
@@ -218,6 +244,9 @@ public class Main extends Application {
         }
         
         players = playerDao.findAll();  // FUNTSI!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        for(Player player : players){  // TESTAAMISEEN!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            System.out.println(player.getName() + " " + player.getWins() + " " + player.getTies() + " " + player.getLosses());
+        }
         
         Scene selectionScene = new Scene(vbox);
         stage.setScene(selectionScene);
