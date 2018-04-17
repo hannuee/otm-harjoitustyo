@@ -10,4 +10,6 @@ Fortress Duel on peli joka on tarkoitettu 2 pelaajan pelattavaksi toisiaan vasta
 
 [Määrittelydokumentti](https://github.com/hannuee/otm-harjoitustyo/blob/master/dokumentointi/maarittelydokumentti.md)
 
+[Arkkitehtuurikuvaus](https://github.com/hannuee/otm-harjoitustyo/blob/master/dokumentointi/arkkitehtuuri.md)
+
 [Työaikakirjanpito](https://github.com/hannuee/otm-harjoitustyo/blob/master/dokumentointi/tyoaikakirjanpito.md)

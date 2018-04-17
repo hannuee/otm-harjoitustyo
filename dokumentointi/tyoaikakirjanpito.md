@@ -1,6 +1,6 @@
 # Työaikakirjanpito
 
-| päivä | aika  | mitä tein  |
+| päivä(pp.kk) | aika(tuntia)  | mitä tein  |
 | :----:|:------| :-----|
 | 22.3  | 2     | Perehdytty toisen kerran ohjeisiin ja päätetty työn aihe lopullisesti. Luotu maven-projekti. Aloitettu ohjelman ytimen, pelilogiikan tekeminen.|
 | 23.3  | 1.5   | Tehty tarvittavat matemaattiset/fyysiset kaavat joilla voi laskea ammuksen sijainnin. Tehty metodit ammuksen sijainnin x ja y koordinaattien laskemista varten pelilogiikkaan.|
@@ -11,19 +11,28 @@
 | 28.3  | 2.66  | Lentoradan bugikorjauksia, FPS testit, refaktoroitu pelilogiikkaa, ammuksen osuman bugikorjaus, ammuksen piirron rajoitus pelikenttään. |
 | 28.3  | 1.16   | Pelin vuoronvaihdon tekemistä logiikassa. |
 | 30.3  | 1.16   | Pelin vuoronvaihdon tekemistä GUI:ssa. |
-| 31.3  | 1.08   | Pelin vuoronvaihdon tekemistä GUI:ssa. |
+| 31.3  | 1.08   | ^samaa. |
 | 1.4  |  0.75  | Palautettu mieleen JDBC:n käyttöä. |
 | 2.4  |  0.75  | Perehdytty kuvien tallentamiseen SQLiteen terminaalista. |
 | 3.4  |  2.0  | Pelikentän, eli kuvan, lukeminen JDBC:n avulla SQLitesta. |
 | 3.4  |  1.33  | Maanpinnan muotojen huomioonottamisen lisäys. |
 | 3.4  |  0.83  | Pelin loppumisen tarkistaminen lisätty. |
 | 7.4  |  1.16  | Ilmanvastuksen huomioimisen tekemistä. |
-| 8.4  |  4.0  | Ilmanvastuksen huomioimisen tekemistä.  |
+| 8.4  |  4.0  | ^samaa.|
 | 10.4  | 4.83   | Ilmanvastuksen huomioiminen saatu valmiiksi. |
-| yht   | 37.64 | | 
+| 10.4  | 2.05   | Järjestelty paketteja, muutettu pom, tehty ensimmäinen testi, testikattavuuskonffaus. |
+| 13.4  | 0.86   |  Kaikkien pelikenttien listaus tietokannasta JA pelikentän valinta & pelaus -syklin tekeminen GUI:hin. |
+| 14.4  | 0.66   | ^samaa. |
+| 15.4  | 1.33   | ^samaa. |
+| 15.4  |  3.08  | Tehty edellytykset tulosten tallentamiseen tietokantaan ja GUIhin. |
+| 16.4  | 2.25   | Tulosten tallentaminen toimii kokonaisuudessaan. |
+| 16.4  | 3.8   | Tehty lisää testejä, checkstylen käyttöönotto ja tyylimokien häivytys. |
+| 17.4  | 0.75   | Tehty alustava luokkakaavio. |
+| yht   | 52.42 | | 
+
 
 
 Ylläolevat tunnit selkeitä työtunteja jolloin tehty sovellusta tietokoneen äärellä.
 
-Näiden tuntien lisäksi kertynyt tähän mennessä karkean arvion mukaan n. 11 tuntia pohdinta-aikaa, eli pohdittu sovelluksen rakennetta, toimintaa ja toteutusta joko pelkästään tai samalla kun tehty jotain muuta, esim. arkisia askareita.
+Näiden tuntien lisäksi kertynyt tähän mennessä karkean arvion mukaan n. 15 tuntia pohdinta-aikaa, eli pohdittu sovelluksen rakennetta, toimintaa ja toteutusta joko pelkästään tai samalla kun tehty jotain muuta, esim. arkisia askareita.
 
