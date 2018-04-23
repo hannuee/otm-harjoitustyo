@@ -3,12 +3,12 @@
  */
 package otmharjoitustyo.logic;
 
+import otmharjoitustyo.domain.Level;
+
 import java.awt.image.BufferedImage;
 import java.awt.Color;
 
 public class Game {
-    
-    BufferedImage gameField;
     
     /*
     States:
@@ -17,15 +17,27 @@ public class Game {
     3 = Right player's turn.
     4 = Simulating the effects of an ammunition shot by the right player.
     */
-    int state;
+    private int state;
+    
+    
+    
+    private Level level;
+    // Due to possible performance gains, some of the information from the given Level 
+    // is copied to the Game instead of using it by reference. 
+    private BufferedImage gameField;
+    private BufferedImage background;
+    private int leftCannonX;
+    private int leftCannonY;
+    private int rightCannonX;
+    private int rightCannonY;
+    private int ammunitionMaxY;
+    private int ammunitionMinY;
+    
+    
+    private BufferedImage gameFieldWithBackground;
     
     private static final int AMMUNITION_RADIUS = 7;
     private static final int EXPLOSION_RADIUS = 50;
-   
-    int leftCannonX;
-    int leftCannonY;
-    int rightCannonX;
-    int rightCannonY;
     
     double initialVx;
     double initialVy;
@@ -38,19 +50,24 @@ public class Game {
     int explosionX;
     int explosionY;
     
-    /**
-     * 
-     * @param gameField Image of the Game Field.
-     */
-    public Game(BufferedImage gameField, int leftCannonX, int leftCannonY, int rightCannonX, int rightCannonY) {
-        this.gameField = gameField;
-        
-        this.leftCannonX = leftCannonX;
-        this.leftCannonY = leftCannonY;
-        this.rightCannonX = rightCannonX;
-        this.rightCannonY = rightCannonY;
-        
+
+    public Game(Level level) {
         this.state = 1;
+        
+        this.level = level;
+        // Due to possible performance gains, some of the information from the given Level 
+        // is copied to the Game instead of using it by reference. 
+        this.gameField = level.getGameField();
+        this.background = level.getBackground();
+        this.leftCannonX = level.getLeftCannonX();
+        this.leftCannonY = level.getLeftCannonY();
+        this.rightCannonX = level.getRightCannonX();
+        this.rightCannonY = level.getRightCannonY();
+        this.ammunitionMaxY = level.getAmmunitionMaxY();
+        this.ammunitionMinY = level.getAmmunitionMinY();
+        
+        
+        this.gameFieldWithBackground = new BufferedImage(gameField.getWidth(), gameField.getHeight(), BufferedImage.TYPE_INT_RGB);
         
         this.oldAmmunitionExist = false;
         this.explosion = false;
@@ -197,6 +214,29 @@ public class Game {
         }
     }
     
+    private void updateGameFieldWithBackground(){     // REFAKTOROI LUUPPI KOMBO!!!!!!!!!!!!!!!!!!!!???????
+        int yMax = gameField.getHeight();
+        int xMax = gameField.getWidth();
+        
+        int y = 0;
+        int x = 0;
+        while (y < yMax) {
+            while (x < xMax) {
+                
+                if(gameField.getRGB(x, y) == Color.WHITE.getRGB()){
+                    gameFieldWithBackground.setRGB(x, y, background.getRGB(x, y));
+                } else {
+                    gameFieldWithBackground.setRGB(x, y, gameField.getRGB(x, y));
+                }
+                
+                ++x;
+            }
+            
+            x = 0;
+            ++y;
+        }
+    }
+    
     public BufferedImage getSimulationSnapshot(double seconds) {
         if (state != 2 && state != 4) {
             return null;
@@ -210,10 +250,11 @@ public class Game {
         int ammunitionY = ammunitionYwithDrag(seconds);
         
         // Tarkastetaan rajat:
-        // jos vas tai oik yli niin palautetaan tyhjä
-        if (ammunitionX < -AMMUNITION_RADIUS || gameField.getWidth() + AMMUNITION_RADIUS < ammunitionX) {
+        // jos vasen, oikea tai alaraja yli niin palautetaan tyhjä ja muutetaan pelin tilaa.
+        if (ammunitionX < -AMMUNITION_RADIUS || gameField.getWidth() + AMMUNITION_RADIUS < ammunitionX || ammunitionY < -AMMUNITION_RADIUS) {
             nextState();
-            return gameField;
+            //updateGameFieldWithBackground();
+            return gameField; //WithBackground;
         }
        
         
@@ -238,12 +279,14 @@ public class Game {
             oldAmmunitionX = ammunitionX;
             oldAmmunitionY = ammunitionY;
         }
-
-        return gameField;
+        
+        //updateGameFieldWithBackground();
+        return gameField; //WithBackground;
     }
     
     public BufferedImage getStaticSnapshot() {
-        return this.gameField;
+        //updateGameFieldWithBackground();
+        return gameField; //WithBackground;
     }
     
     public void setAndFireCannon(int initialVx, int initialVy) {
@@ -263,37 +306,53 @@ public class Game {
         return state;
     }
     
-    public String checkWinner() {
-        int blackPixels = 0;
-        int redPixels = 0;
+    public String checkWinner() {     // REFAKTOROI!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        int leftFortressPixels = 0;
+        int rightFortressPixels = 0;
         
-        int yMax = gameField.getHeight();
-        int xMax = gameField.getWidth();
-        
-        int y = 0;
-        int x = 0;
+        // Left:
+        int yMax = level.getLeftFortressMaxY();
+        int xMax = level.getLeftFortressMaxX();
+        int y = level.getLeftFortressMinY();
+        int x = level.getLeftFortressMinX();
         while (y < yMax) {
             while (x < xMax) {
                 
-                int pixelColor = gameField.getRGB(x, y);
-                if (pixelColor == Color.BLACK.getRGB()) {
-                    ++blackPixels;
-                } else if (pixelColor == Color.RED.getRGB()) {
-                    ++redPixels;
+                if (gameField.getRGB(x, yTransform(y)) != Color.WHITE.getRGB()) {
+                    ++leftFortressPixels;
                 }
                 
                 ++x;
             }
             
-            x = 0;
+            x = level.getLeftFortressMinX();
             ++y;
         }
         
-        if (blackPixels > 0 && redPixels > 0) {
+        // Right:
+        yMax = level.getRightFortressMaxY();
+        xMax = level.getRightFortressMaxX();
+        y = level.getRightFortressMinY();
+        x = level.getRightFortressMinX();
+        while (y < yMax) {
+            while (x < xMax) {
+                
+                if (gameField.getRGB(x, yTransform(y)) != Color.WHITE.getRGB()) {
+                    ++rightFortressPixels;
+                }
+                
+                ++x;
+            }
+            
+            x = level.getRightFortressMinX();
+            ++y;
+        }
+        
+        if (leftFortressPixels > 0 && rightFortressPixels > 0) {
             return null;
-        } else if (blackPixels == 0 && redPixels == 0) {
+        } else if (leftFortressPixels == 0 && rightFortressPixels == 0) {
             return "TIE!";
-        } else if (blackPixels == 0) {
+        } else if (leftFortressPixels == 0) {
             return "Right player won!";
         } else {
             return "Left player won!";

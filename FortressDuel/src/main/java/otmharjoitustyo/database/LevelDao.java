@@ -33,13 +33,37 @@ public class LevelDao {
         
         if (result.next()) {
             
-            BufferedImage gameField = ImageIO.read(result.getBinaryStream("gamefield"));
+            BufferedImage gameField = ImageIO.read(result.getBinaryStream("gameField"));
+            BufferedImage background = ImageIO.read(result.getBinaryStream("background"));
+            
+            int leftCannonX = result.getInt("leftCannonX");
+            int leftCannonY = result.getInt("leftCannonY");
+            int rightCannonX = result.getInt("rightCannonX"); 
+            int rightCannonY = result.getInt("rightCannonY"); 
+
+            int leftFortressMaxX = result.getInt("leftFortressMaxX"); 
+            int leftFortressMinX = result.getInt("leftFortressMinX"); 
+            int leftFortressMaxY = result.getInt("leftFortressMaxY"); 
+            int leftFortressMinY = result.getInt("leftFortressMinY"); 
+
+            int rightFortressMaxX = result.getInt("rightFortressMaxX"); 
+            int rightFortressMinX = result.getInt("rightFortressMinX"); 
+            int rightFortressMaxY = result.getInt("rightFortressMaxY"); 
+            int rightFortressMinY = result.getInt("rightFortressMinY"); 
+
+            boolean vacuumPossible = result.getBoolean("vacuumPossible");
+            int ammunitionMaxY = result.getInt("ammunitionMaxY"); 
+            int ammunitionMinY = result.getInt("ammunitionMinY");
             
             result.close();
             statement.close();
             connection.close();
             
-            return new Level(name, gameField);
+            return new Level(name, gameField, background, 
+                 leftCannonX, leftCannonY, rightCannonX, rightCannonY, 
+                 leftFortressMaxX, leftFortressMinX, leftFortressMaxY, leftFortressMinY, 
+                 rightFortressMaxX, rightFortressMinX, rightFortressMaxY, rightFortressMinY, 
+                 vacuumPossible, ammunitionMaxY, ammunitionMinY);
             
         } else {
             
@@ -51,26 +75,26 @@ public class LevelDao {
         }
     }
     
-    // return a list with only names.
-    public ArrayList<Level> listAll() throws SQLException, IOException {
+    // returns a list of level names.
+    public ArrayList<String> listAll() throws SQLException, IOException {
         Connection connection = this.database.getConnection();
-        PreparedStatement statement = connection.prepareStatement("SELECT * FROM Level");
+        PreparedStatement statement = connection.prepareStatement("SELECT name FROM Level");
         
         ResultSet result = statement.executeQuery();
         
-        ArrayList<Level> levels = new ArrayList<>();
+        ArrayList<String> levelNames = new ArrayList<>();
         
         while (result.next()) {
             String name = result.getString("name");
             
-            levels.add(new Level(name, null));
+            levelNames.add(name);
         } 
             
         result.close();
         statement.close();
         connection.close();
         
-        return levels;
+        return levelNames;
     }
     
 }

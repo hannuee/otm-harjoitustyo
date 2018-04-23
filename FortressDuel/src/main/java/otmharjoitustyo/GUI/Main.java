@@ -39,36 +39,22 @@ import javafx.scene.control.TextField;
 
 public class Main extends Application {
     
-    Database database;
     LevelDao levelDao;
     PlayerDao playerDao;
     
-    ArrayList<Player> players;
-    
-    BufferedImage gameField;
-    Game game;
-    
-    Player leftPlayer;
-    Player rightPlayer;
-    
-    Stage stage;
-    
     @Override
     public void init() throws SQLException, IOException {
-        database = new Database("jdbc:sqlite:Gamedata.db");
+        Database database = new Database("jdbc:sqlite:Gamedata.db");
         levelDao = new LevelDao(database);
         playerDao = new PlayerDao(database);
     }
 
-    private void buildAndSetGameScene(){
-        final int width = gameField.getWidth();
-        final int height = gameField.getHeight();
-        
-        Canvas canvas = new Canvas(width, height);
+    private void buildAndSetGameScene(Stage stage, Game game, Level level, Player leftPlayer, Player rightPlayer){
+        Canvas canvas = new Canvas(level.getGameField().getWidth(), level.getGameField().getHeight());
         GraphicsContext pen = canvas.getGraphicsContext2D();
         BorderPane layout = new BorderPane();
         layout.setCenter(canvas);
-   
+        
         // Simulaation näyttäminen.
         AnimationTimer simulation = new AnimationTimer() {
             
@@ -91,12 +77,12 @@ public class Main extends Application {
                 if(current == simuTime){
                     ++counter;
                 } else {
-                    System.out.println("Frames during " + current + "s: " + counter);
+                    //System.out.println("Frames during " + current + "s: " + counter);
                     current = simuTime;
                     counter = 1;
                 }
 
-                BufferedImage gameImage = game.getSimulationSnapshot(simulationTime);
+                BufferedImage gameImage = game.getSimulationSnapshot(1.5*simulationTime);
                 if(gameImage != null){
                     Image image = SwingFXUtils.toFXImage(gameImage, null);
                     pen.drawImage(image, 0, 0);
@@ -108,7 +94,7 @@ public class Main extends Application {
                     if(game.getState() == 1){
                         String result = game.checkWinner();
                         if(result != null){
-                            System.out.println(result); // FOR TESTING!!!!!!!!!!!!!!!!!!!!!!!!!!
+                            //System.out.println(result); // FOR TESTING!!!!!!!!!!!!!!!!!!!!!!!!!!
                             
                             if(result.equals("TIE!")){
                                 leftPlayer.addTie();
@@ -125,13 +111,13 @@ public class Main extends Application {
                                 playerDao.update(leftPlayer);
                                 playerDao.update(rightPlayer);
                             } catch(Exception e){
-                                System.out.println("ERROR1");// ERROR?!?!?!?!?!?????????????????????
+                                //System.out.println("ERROR1");// ERROR?!?!?!?!?!?????????????????????
                             }
                             
                             try{
-                                buildAndSetSelectionScene();
+                                buildAndSetSelectionScene(stage);
                             } catch(Exception e){
-                                System.out.println("ERROR2");// ERROR?!?!?!?!?!?????????????????????
+                                //System.out.println("ERROR2");// ERROR?!?!?!?!?!?????????????????????
                             }
                             
                         } 
@@ -149,24 +135,24 @@ public class Main extends Application {
                 
                 pen.setStroke(Color.BLACK);
                 // 1 x y  2 x y
-                pen.strokeLine(228, 600 - 238, event.getX(), event.getY());  // 600 - 238:hin joku yTransform JA tykin sijainti levelistä!!!! 
+                pen.strokeLine(level.getLeftCannonX(), 700 - level.getLeftCannonY(), event.getX(), event.getY());  // 600 - 238:hin joku yTransform JA tykin sijainti levelistä!!!! 
             } else if(game.getState() == 3){
                 Image image = SwingFXUtils.toFXImage(game.getStaticSnapshot(), null);
                 pen.drawImage(image, 0, 0);
                 
                 pen.setStroke(Color.BLACK);
                 // 1 x y  2 x y
-                pen.strokeLine(733, 600 - 238, event.getX(), event.getY());  // 600 - 238:hin joku yTransform.
+                pen.strokeLine(level.getRightCannonX(), 700 - level.getRightCannonY(), event.getX(), event.getY());  // 600 - 238:hin joku yTransform.
             }  
         });
         
         // Firing of the cannons.
         canvas.setOnMouseClicked((event) -> {
             if(game.getState() == 1){
-                game.setAndFireCannon((int)event.getX() - 228, 600 - (int)event.getY() - 238);  // Tähänkin jotkut hienot transformit.
+                game.setAndFireCannon((int)event.getX() - level.getLeftCannonX(), 700 - (int)event.getY() - level.getLeftCannonY());  // Tähänkin jotkut hienot transformit.
                 simulation.start();
             } else if(game.getState() == 3){
-                game.setAndFireCannon((int)event.getX() - 733, 600 - (int)event.getY() - 238);  // Tähänkin jotkut hienot transformit.
+                game.setAndFireCannon((int)event.getX() - level.getRightCannonX(), 700 - (int)event.getY() - level.getRightCannonY());  // Tähänkin jotkut hienot transformit.
                 simulation.start();
             }
         });
@@ -175,7 +161,7 @@ public class Main extends Application {
         stage.setScene(gameScene);
     }
     
-    private void buildAndSetNameEntryScene(Level level) {
+    private void buildAndSetNameEntryScene(Stage stage, String levelName) {
         Label leftSideLabel = new Label("Nickname of the player on the left side:");
         TextField leftSideNickname = new TextField();
         leftSideNickname.setMaxWidth(220.00);
@@ -186,16 +172,20 @@ public class Main extends Application {
         
         Button startButton = new Button("Start The Game!");
         startButton.setOnAction((event) -> {
+            Level level = null;
+            Game game = null;
             try{
-                gameField = levelDao.findOne(level.getName()).getGameField();
-                game = new Game(gameField, 228, 238, 733, 238);
+                level = levelDao.findOne(levelName);
+                game = new Game(level);
             } catch(Exception e){
-                System.out.println("Error while loading the level!");  // MUUTA GRAAFISEKS?!?!?!?!?!
+                //System.out.println("Error while loading the level!");  // MUUTA GRAAFISEKS?!?!?!?!?!
             }
             
             
             String leftPlayerNickname = leftSideNickname.getText();   // TARKASTA ETTÄ EI OLE SAMA NIMI!!!!!!!!!
             String rightPlayerNickname = rightSideNickname.getText(); 
+            Player leftPlayer = null;
+            Player rightPlayer = null;
             try{
                 leftPlayer = playerDao.findOne(leftPlayerNickname);
                 rightPlayer = playerDao.findOne(rightPlayerNickname);
@@ -212,7 +202,7 @@ public class Main extends Application {
             } catch(Exception e){   
             }
             
-            buildAndSetGameScene();
+            buildAndSetGameScene(stage, game, level, leftPlayer, rightPlayer);
         });
         
         VBox vbox = new VBox();
@@ -229,25 +219,25 @@ public class Main extends Application {
         stage.setScene(nameEntryScene);
     }
     
-    private void buildAndSetSelectionScene() throws SQLException, IOException{
+    private void buildAndSetSelectionScene(Stage stage) throws SQLException, IOException{
         VBox vbox = new VBox();
         vbox.setPrefSize(300, 180);
         vbox.setSpacing(10);
         vbox.setPadding(new Insets(30, 30, 30, 30));
         
-        ArrayList<Level> levels = levelDao.listAll();
-        for(Level level : levels){
+        ArrayList<String> levelNames = levelDao.listAll();
+        for(String levelName : levelNames){
             
-            Button levelButton = new Button(level.getName());
+            Button levelButton = new Button(levelName);
             levelButton.setOnAction((event) -> {
-                buildAndSetNameEntryScene(level);
+                buildAndSetNameEntryScene(stage, levelName);
             });
             vbox.getChildren().add(levelButton);
         }
         
-        players = playerDao.findAll();  // FUNTSI!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        ArrayList<Player> players = playerDao.findAll();  // FUNTSI!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         for(Player player : players){  // TESTAAMISEEN!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            System.out.println(player.getName() + " " + player.getWins() + " " + player.getTies() + " " + player.getLosses());
+            //System.out.println(player.getName() + " " + player.getWins() + " " + player.getTies() + " " + player.getLosses());
         }
         
         Scene selectionScene = new Scene(vbox);
@@ -256,10 +246,7 @@ public class Main extends Application {
     
     @Override
     public void start(Stage stage) throws SQLException, IOException{
-        this.stage = stage;
-
-        buildAndSetSelectionScene();
-      
+        buildAndSetSelectionScene(stage);
         stage.show();
     }
     
