@@ -6,6 +6,7 @@ import otmharjoitustyo.logic.*;
 import otmharjoitustyo.domain.*;
 import otmharjoitustyo.database.*;
 
+import java.util.ArrayList;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -35,6 +36,24 @@ public class AllTest {
     @Test
     public void databaseReturnsLevel() throws SQLException, IOException {
         assertNotNull(level);
+    }
+    
+    @Test
+    public void databaseReturnsCorrectPlayer() throws SQLException, IOException {
+        Database database = new Database("jdbc:sqlite:Gamedata.db");
+        PlayerDao playerDao = new PlayerDao(database);
+        
+        Player player = playerDao.findOne("Jack");
+        assertEquals("Jack", player.getName());
+    }
+    
+    @Test
+    public void databaseReturnsAllPlayers() throws SQLException, IOException {
+        Database database = new Database("jdbc:sqlite:Gamedata.db");
+        PlayerDao playerDao = new PlayerDao(database);
+        
+        ArrayList<Player> players = playerDao.findAll();
+        assertEquals(2, players.size());
     }
     
     
