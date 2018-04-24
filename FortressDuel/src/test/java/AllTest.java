@@ -48,11 +48,11 @@ public class AllTest {
     }
     
     @Test
-    public void databaseReturnsAllPlayers() throws SQLException, IOException {
+    public void databaseReturnsWinners() throws SQLException, IOException {
         Database database = new Database("jdbc:sqlite:Gamedata.db");
         PlayerDao playerDao = new PlayerDao(database);
         
-        ArrayList<Player> players = playerDao.findAll();
+        ArrayList<Player> players = playerDao.findWinners();
         assertEquals(2, players.size());
     }
     

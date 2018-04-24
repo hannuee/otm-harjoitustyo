@@ -31,6 +31,7 @@ import java.sql.SQLException;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
 import java.util.ArrayList;
 
 // Name entry scene
@@ -220,10 +221,10 @@ public class Main extends Application {
     }
     
     private void buildAndSetSelectionScene(Stage stage) throws SQLException, IOException{
-        VBox vbox = new VBox();
-        vbox.setPrefSize(300, 180);
-        vbox.setSpacing(10);
-        vbox.setPadding(new Insets(30, 30, 30, 30));
+        VBox vboxLevels = new VBox();
+        vboxLevels.setPrefSize(300, 180);
+        vboxLevels.setSpacing(10);
+        vboxLevels.setPadding(new Insets(30, 30, 30, 30));
         
         ArrayList<String> levelNames = levelDao.listAll();
         for(String levelName : levelNames){
@@ -232,15 +233,27 @@ public class Main extends Application {
             levelButton.setOnAction((event) -> {
                 buildAndSetNameEntryScene(stage, levelName);
             });
-            vbox.getChildren().add(levelButton);
+            vboxLevels.getChildren().add(levelButton);
         }
         
-        ArrayList<Player> players = playerDao.findAll();  // FUNTSI!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        for(Player player : players){  // TESTAAMISEEN!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            //System.out.println(player.getName() + " " + player.getWins() + " " + player.getTies() + " " + player.getLosses());
+        
+        VBox vboxWinners = new VBox();
+        vboxWinners.setPrefSize(300, 180);
+        vboxWinners.setSpacing(10);
+        vboxWinners.setPadding(new Insets(30, 30, 30, 30));
+        vboxWinners.getChildren().add(new Label("Players with most wins"));
+        
+        ArrayList<Player> players = playerDao.findWinners();  
+        for(Player player : players){
+            vboxWinners.getChildren().add(new Label(player.getName() + "  " + player.getWins()));
         }
         
-        Scene selectionScene = new Scene(vbox);
+        
+        HBox hbox = new HBox();
+        hbox.getChildren().add(vboxLevels);
+        hbox.getChildren().add(vboxWinners);
+        
+        Scene selectionScene = new Scene(hbox);
         stage.setScene(selectionScene);
     }
     

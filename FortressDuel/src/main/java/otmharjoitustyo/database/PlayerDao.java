@@ -48,9 +48,9 @@ public class PlayerDao {
         }
     }
     
-    public ArrayList<Player> findAll() throws SQLException {
+    public ArrayList<Player> findWinners() throws SQLException {
         Connection connection = this.database.getConnection();
-        PreparedStatement statement = connection.prepareStatement("SELECT * FROM Player");
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM Player ORDER BY wins DESC LIMIT 5");
         
         ResultSet result = statement.executeQuery();
         
