@@ -214,7 +214,7 @@ public class Game {
         }
     }
     
-    private void updateGameFieldWithBackground(){     // REFAKTOROI LUUPPI KOMBO!!!!!!!!!!!!!!!!!!!!???????
+    private void updateGameFieldWithBackground() {     // REFAKTOROI LUUPPI KOMBO!!!!!!!!!!!!!!!!!!!!???????
         int yMax = gameField.getHeight();
         int xMax = gameField.getWidth();
         
@@ -223,7 +223,7 @@ public class Game {
         while (y < yMax) {
             while (x < xMax) {
                 
-                if(gameField.getRGB(x, y) == Color.WHITE.getRGB()){
+                if (gameField.getRGB(x, y) == Color.WHITE.getRGB()) {
                     gameFieldWithBackground.setRGB(x, y, background.getRGB(x, y));
                 } else {
                     gameFieldWithBackground.setRGB(x, y, gameField.getRGB(x, y));
@@ -306,47 +306,35 @@ public class Game {
         return state;
     }
     
+    private int countNonWhitePixelsFromDefinedImageArea(BufferedImage image, int minX, int maxX, int minY, int maxY) {
+        int nonWhitePixels = 0;
+        
+        int yIndex = minY;
+        int xIndex = minX;
+        while (yIndex < maxY) {
+            while (xIndex < maxX) {
+                
+                if (image.getRGB(xIndex, yTransform(yIndex)) != Color.WHITE.getRGB()) {
+                    ++nonWhitePixels;
+                }
+                
+                ++xIndex;
+            }
+            
+            xIndex = minX;
+            ++yIndex;
+        }
+        
+        return nonWhitePixels;
+    }
+    
     public String checkWinner() {     // REFAKTOROI!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        int leftFortressPixels = 0;
-        int rightFortressPixels = 0;
-        
-        // Left:
-        int yMax = level.getLeftFortressMaxY();
-        int xMax = level.getLeftFortressMaxX();
-        int y = level.getLeftFortressMinY();
-        int x = level.getLeftFortressMinX();
-        while (y < yMax) {
-            while (x < xMax) {
-                
-                if (gameField.getRGB(x, yTransform(y)) != Color.WHITE.getRGB()) {
-                    ++leftFortressPixels;
-                }
-                
-                ++x;
-            }
-            
-            x = level.getLeftFortressMinX();
-            ++y;
-        }
-        
-        // Right:
-        yMax = level.getRightFortressMaxY();
-        xMax = level.getRightFortressMaxX();
-        y = level.getRightFortressMinY();
-        x = level.getRightFortressMinX();
-        while (y < yMax) {
-            while (x < xMax) {
-                
-                if (gameField.getRGB(x, yTransform(y)) != Color.WHITE.getRGB()) {
-                    ++rightFortressPixels;
-                }
-                
-                ++x;
-            }
-            
-            x = level.getRightFortressMinX();
-            ++y;
-        }
+        int leftFortressPixels = countNonWhitePixelsFromDefinedImageArea(gameField, 
+                level.getLeftFortressMinX(), level.getLeftFortressMaxX(), 
+                level.getLeftFortressMinY(), level.getLeftFortressMaxY());
+        int rightFortressPixels = countNonWhitePixelsFromDefinedImageArea(gameField, 
+                level.getRightFortressMinX(), level.getRightFortressMaxX(), 
+                level.getRightFortressMinY(), level.getRightFortressMaxY());
         
         if (leftFortressPixels > 0 && rightFortressPixels > 0) {
             return null;
