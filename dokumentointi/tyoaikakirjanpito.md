@@ -28,11 +28,18 @@
 | 16.4  | 2.25   | Tulosten tallentaminen toimii kokonaisuudessaan. |
 | 16.4  | 3.8   | Tehty lisää testejä, checkstylen käyttöönotto ja tyylimokien häivytys. |
 | 17.4  | 0.75   | Tehty alustava luokkakaavio. |
-| yht   | 52.42 | | 
+| 20.4  | 1.40   | Grafiikoiden ihmettelyä, Javan teknisestä näkökulmasta ja sopivien graffojen etsimistä. |
+| 21.4  |  1.66  | Ilmasen vectori graffa ohj. etsimistä, kenttien tekemistä ja grafiikoiden etsintää |
+| 22.4  |  4.50  | Kenttien tekemistä ja grafiikoiden etsintää |
+| 22.4  | 1.33   | Koodin ja tietokannan muutokset grafiikkoja varten JA hieman koodin rakenteen muuttamista muutenkin samalla. Päivitetty testit myös muutoksien mukaisiksi. |
+| 23.4  |  6.50  | ^samaa. |
+| 23.4  |  0.18  | Lisätty testejä. |
+| 24.4  |  3.00  | Lisätty alkeellinen scoreboard, pieni refaktorointi, korjattu checkstylen kehoittamia pieniä asioita, release, README.md päivitys, sekvenssikaavio ja työaikakirjanpidon päivitys. |
+| yht   | 70.99 | | 
 
 
 
 Ylläolevat tunnit selkeitä työtunteja jolloin tehty sovellusta tietokoneen äärellä.
 
-Näiden tuntien lisäksi kertynyt tähän mennessä karkean arvion mukaan n. 15 tuntia pohdinta-aikaa, eli pohdittu sovelluksen rakennetta, toimintaa ja toteutusta joko pelkästään tai samalla kun tehty jotain muuta, esim. arkisia askareita.
+Näiden tuntien lisäksi kertynyt tähän mennessä karkean arvion mukaan n. 21 tuntia pohdinta-aikaa, eli pohdittu sovelluksen rakennetta, toimintaa ja toteutusta joko pelkästään tai samalla kun tehty jotain muuta, esim. arkisia askareita.
 
