@@ -7,4 +7,4 @@ Alustava luokkakaavio ohjelman tämänhetkisestä rakenteesta, gui jätetty pois. Ra
 
 Sekvenssikaavio Scoreboardin hakemisesta kun ohjelma käynnistetään:
 
-<img src="https://github.com/hannuee/otm-harjoitustyo/blob/master/dokumentointi/sekvenssikaavioScoreboard.png.png" width="786" height="442">
+<img src="https://github.com/hannuee/otm-harjoitustyo/blob/master/dokumentointi/sekvenssikaavioScoreboard.png" width="786" height="442">
