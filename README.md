@@ -21,7 +21,7 @@ Fortress Duel on peli joka on tarkoitettu 2 pelaajan pelattavaksi toisiaan vasta
 
 
 ## Komentorivitoiminnot
-¨
+
 Kaikki allaolevat toiminnot voi myös suorittaa NetBeansin painikkeilla.
 Seuraavat komennot tulee suorittaa kansiossa _otm-harjoitustyo\FortressDuel_.
 
