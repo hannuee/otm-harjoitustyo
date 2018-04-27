@@ -27,16 +27,19 @@ import javafx.scene.paint.Color;
 
 import java.sql.SQLException;
 
+// Game scene
+import javafx.scene.control.ProgressBar;
+
+// Name entry scene
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+
 // Game selection scene
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
 import java.util.ArrayList;
-
-// Name entry scene
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 
 public class Main extends Application {
     
@@ -53,8 +56,19 @@ public class Main extends Application {
     private void buildAndSetGameScene(Stage stage, Game game, Level level, Player leftPlayer, Player rightPlayer){
         Canvas canvas = new Canvas(level.getGameField().getWidth(), level.getGameField().getHeight());
         GraphicsContext pen = canvas.getGraphicsContext2D();
-        BorderPane layout = new BorderPane();
-        layout.setCenter(canvas);
+        
+        HBox hbox = new HBox();
+        Label leftLabel = new Label("Left player");
+        ProgressBar leftBar = new ProgressBar(game.leftFortressPercentage());
+        Label rightLabel = new Label("Right player");
+        ProgressBar rightBar = new ProgressBar(game.rightFortressPercentage());
+        leftLabel.setTextFill(Color.RED);
+        rightLabel.setTextFill(Color.BLACK);
+        hbox.getChildren().addAll(leftLabel, leftBar, rightLabel, rightBar);
+        
+        VBox vbox = new VBox();
+        vbox.getChildren().add(canvas);
+        vbox.getChildren().add(hbox); 
         
         // Simulaation näyttäminen.
         AnimationTimer simulation = new AnimationTimer() {
@@ -91,19 +105,23 @@ public class Main extends Application {
                     this.stop();
                     startTime = -1;
                     
+                    leftBar.setProgress(game.leftFortressPercentage());
+                    rightBar.setProgress(game.rightFortressPercentage());
+                    
                     // Game over check.
                     if(game.getState() == 1){
-                        String result = game.checkWinner();
-                        if(result != null){
-                            //System.out.println(result); // FOR TESTING!!!!!!!!!!!!!!!!!!!!!!!!!!
-                            
-                            if(result.equals("TIE!")){
+                        
+                        int leftFortressPixels = game.leftFortressPixels();
+                        int rightFortressPixels = game.rightFortressPixels();
+
+                        if (!(leftFortressPixels > 0 && rightFortressPixels > 0)) {  // Is Game still in progress?
+                            if (leftFortressPixels == 0 && rightFortressPixels == 0) {  // TIE!
                                 leftPlayer.addTie();
                                 rightPlayer.addTie();
-                            } else if(result.equals("Right player won!")){
+                            } else if (leftFortressPixels == 0) {  // Right player won!
                                 leftPlayer.addLoss();
                                 rightPlayer.addWin();
-                            } else {  // Left won
+                            } else {  // Left player won!
                                 leftPlayer.addWin();
                                 rightPlayer.addLoss();
                             }
@@ -120,9 +138,16 @@ public class Main extends Application {
                             } catch(Exception e){
                                 //System.out.println("ERROR2");// ERROR?!?!?!?!?!?????????????????????
                             }
-                            
-                        } 
+                        }
                     }
+                    
+                    // Coloring the player's name red who's turn it is now that this simulation is over.
+                    if(game.getState() == 1){
+                        leftLabel.setTextFill(Color.RED);
+                    } else if(game.getState() == 3){
+                        rightLabel.setTextFill(Color.RED);
+                    }
+                    
                 }                    
                 
             }
@@ -151,14 +176,16 @@ public class Main extends Application {
         canvas.setOnMouseClicked((event) -> {
             if(game.getState() == 1){
                 game.setAndFireCannon((int)event.getX() - level.getLeftCannonX(), 700 - (int)event.getY() - level.getLeftCannonY());  // Tähänkin jotkut hienot transformit.
+                leftLabel.setTextFill(Color.BLACK);  // Player's turn is over so the name is colored back to black.
                 simulation.start();
             } else if(game.getState() == 3){
                 game.setAndFireCannon((int)event.getX() - level.getRightCannonX(), 700 - (int)event.getY() - level.getRightCannonY());  // Tähänkin jotkut hienot transformit.
+                rightLabel.setTextFill(Color.BLACK);  // Player's turn is over so the name is colored back to black.
                 simulation.start();
             }
         });
         
-        Scene gameScene = new Scene(layout);
+        Scene gameScene = new Scene(vbox);
         stage.setScene(gameScene);
     }
     

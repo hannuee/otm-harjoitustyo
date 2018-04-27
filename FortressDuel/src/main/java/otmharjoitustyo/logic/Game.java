@@ -50,6 +50,8 @@ public class Game {
     int explosionX;
     int explosionY;
     
+    int leftFortressPixelsStart;
+    int rightFortressPixelsStart;
 
     public Game(Level level) {
         this.state = 1;
@@ -68,9 +70,13 @@ public class Game {
         
         
         this.gameFieldWithBackground = new BufferedImage(gameField.getWidth(), gameField.getHeight(), BufferedImage.TYPE_INT_RGB);
+        initializeGameFieldWithBackground();
         
         this.oldAmmunitionExist = false;
         this.explosion = false;
+        
+        this.leftFortressPixelsStart = leftFortressPixels();
+        this.rightFortressPixelsStart = rightFortressPixels();
     }
     
     private void nextState() {
@@ -214,7 +220,7 @@ public class Game {
         }
     }
     
-    private void updateGameFieldWithBackground() {     // REFAKTOROI LUUPPI KOMBO!!!!!!!!!!!!!!!!!!!!???????
+    private void initializeGameFieldWithBackground() {     // REFAKTOROI LUUPPI KOMBO!!!!!!!!!!!!!!!!!!!!???????
         int yMax = gameField.getHeight();
         int xMax = gameField.getWidth();
         
@@ -328,13 +334,29 @@ public class Game {
         return nonWhitePixels;
     }
     
-    public String checkWinner() {     // REFAKTOROI!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        int leftFortressPixels = countNonWhitePixelsFromDefinedImageArea(gameField, 
+    public int leftFortressPixels(){
+        return countNonWhitePixelsFromDefinedImageArea(gameField, 
                 level.getLeftFortressMinX(), level.getLeftFortressMaxX(), 
                 level.getLeftFortressMinY(), level.getLeftFortressMaxY());
-        int rightFortressPixels = countNonWhitePixelsFromDefinedImageArea(gameField, 
+    }
+    
+    public int rightFortressPixels(){
+        return countNonWhitePixelsFromDefinedImageArea(gameField, 
                 level.getRightFortressMinX(), level.getRightFortressMaxX(), 
                 level.getRightFortressMinY(), level.getRightFortressMaxY());
+    }
+    
+    public double leftFortressPercentage(){
+        return leftFortressPixels() / (1.0 *this.leftFortressPixelsStart);
+    }
+    
+    public double rightFortressPercentage(){
+        return rightFortressPixels() / (1.0 *this.rightFortressPixelsStart);
+    }
+    
+    public String checkWinner() {
+        int leftFortressPixels = leftFortressPixels();
+        int rightFortressPixels = rightFortressPixels();
         
         if (leftFortressPixels > 0 && rightFortressPixels > 0) {
             return null;
