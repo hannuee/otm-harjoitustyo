@@ -177,9 +177,10 @@ public class Game {
         return (int) ((up1 - up2 + up3) / a);
     }
     
-    private boolean insertCircleWithImpactDetectionOption(int circleX, int circleY, int radius, int color, boolean detectionON) {
-        int yMax = gameField.getHeight();
-        int xMax = gameField.getWidth();
+    // COLOR OR FILLIMAGE!!!!!!!!
+    private boolean insertCircleWithImpactDetectionOption(BufferedImage image, int circleX, int circleY, int radius, Color color, BufferedImage fillImage, boolean detectionON) {
+        int yMax = image.getHeight();
+        int xMax = image.getWidth();
         
         int y = circleY + radius;
         int x = circleX - radius;
@@ -196,10 +197,15 @@ public class Game {
                     
                     // gameField boundary check.        // <= VS <   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                     if (0 < x && x < xMax && 0 < y && y < yMax) {
-                        if (detectionON && gameField.getRGB(x, yTransform(y)) != Color.WHITE.getRGB()) {  // Not white == impact into fortress or ground. 
+                        if (detectionON && image.getRGB(x, yTransform(y)) != Color.WHITE.getRGB()) {  // Not white == impact into fortress or ground. 
                             return true;
                         }
-                        gameField.setRGB(x, yTransform(y), color);
+                        if(color != null){  // Fill circle with given color.
+                            image.setRGB(x, yTransform(y), color.getRGB());
+                        } else {            // Fill circle with given image.
+                            image.setRGB(x, yTransform(y), fillImage.getRGB(x, yTransform(y)));
+                        }
+                        
                     }
                 }
                 
@@ -215,7 +221,8 @@ public class Game {
     
     private void removeOldAmmunitionIfExistent() {
         if (oldAmmunitionExist) {
-            insertCircleWithImpactDetectionOption(oldAmmunitionX, oldAmmunitionY, AMMUNITION_RADIUS, Color.WHITE.getRGB(), false);
+            insertCircleWithImpactDetectionOption(gameField, oldAmmunitionX, oldAmmunitionY, AMMUNITION_RADIUS, Color.WHITE, null, false);
+            insertCircleWithImpactDetectionOption(gameFieldWithBackground, oldAmmunitionX, oldAmmunitionY, AMMUNITION_RADIUS, null, background, false);
             oldAmmunitionExist = false;
         }
     }
@@ -259,20 +266,21 @@ public class Game {
         // jos vasen, oikea tai alaraja yli niin palautetaan tyhjä ja muutetaan pelin tilaa.
         if (ammunitionX < -AMMUNITION_RADIUS || gameField.getWidth() + AMMUNITION_RADIUS < ammunitionX || ammunitionY < -AMMUNITION_RADIUS) {
             nextState();
-            //updateGameFieldWithBackground();
-            return gameField; //WithBackground;
+            return gameFieldWithBackground;
         }
        
         
         boolean impact = false;
         
         // Tarkastetaan osuma linnoihin ja maahan samalla kun piirretään ammuksen uutta paikkaa.
-        impact = insertCircleWithImpactDetectionOption(ammunitionX, ammunitionY, AMMUNITION_RADIUS, Color.RED.getRGB(), true);
-
+        impact = insertCircleWithImpactDetectionOption(gameField, ammunitionX, ammunitionY, AMMUNITION_RADIUS, Color.RED, null, true);
+        insertCircleWithImpactDetectionOption(gameFieldWithBackground, ammunitionX, ammunitionY, AMMUNITION_RADIUS, Color.RED, null, false);
+        
         // Jos osui maahan tai linnaan.
         if (impact) {
             // Poistetaan linnapixelit räjähdysalueelta ja samalla ammus:
-            insertCircleWithImpactDetectionOption(ammunitionX, ammunitionY, EXPLOSION_RADIUS, Color.WHITE.getRGB(), false);
+            insertCircleWithImpactDetectionOption(gameField, ammunitionX, ammunitionY, EXPLOSION_RADIUS, Color.WHITE, null, false);
+            insertCircleWithImpactDetectionOption(gameFieldWithBackground, ammunitionX, ammunitionY, EXPLOSION_RADIUS, null, background, false);
             oldAmmunitionExist = false;
             
             nextState();
@@ -286,13 +294,11 @@ public class Game {
             oldAmmunitionY = ammunitionY;
         }
         
-        //updateGameFieldWithBackground();
-        return gameField; //WithBackground;
+        return gameFieldWithBackground;
     }
-    
+     
     public BufferedImage getStaticSnapshot() {
-        //updateGameFieldWithBackground();
-        return gameField; //WithBackground;
+        return gameFieldWithBackground;
     }
     
     public void setAndFireCannon(int initialVx, int initialVy) {
@@ -354,7 +360,7 @@ public class Game {
         return rightFortressPixels() / (1.0 *this.rightFortressPixelsStart);
     }
     
-    public String checkWinner() {
+    public String checkWinner() {   // EI ENÄÄN TARPEELLINEN.
         int leftFortressPixels = leftFortressPixels();
         int rightFortressPixels = rightFortressPixels();
         

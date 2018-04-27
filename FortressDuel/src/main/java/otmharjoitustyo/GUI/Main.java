@@ -92,7 +92,7 @@ public class Main extends Application {
                 if(current == simuTime){
                     ++counter;
                 } else {
-                    //System.out.println("Frames during " + current + "s: " + counter);
+                    System.out.println("Frames during " + current + "s: " + counter);
                     current = simuTime;
                     counter = 1;
                 }
