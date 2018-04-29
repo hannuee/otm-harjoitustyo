@@ -54,6 +54,10 @@ public class Level {
         this.rightFortressMinX = rightFortressMinX;
         this.rightFortressMaxY = rightFortressMaxY;
         this.rightFortressMinY = rightFortressMinY;
+        
+        this.vacuumPossible = vacuumPossible;
+        this.ammunitionMaxY = ammunitionMaxY;
+        this.ammunitionMinY = ammunitionMinY;
     }
     
     public String getName() {

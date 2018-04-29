@@ -144,7 +144,7 @@ public class Main extends Application {
                     // Coloring the player's name red who's turn it is now that this simulation is over.
                     if(game.getState() == 1){
                         leftLabel.setTextFill(Color.RED);
-                    } else if(game.getState() == 3){
+                    } else if(game.getState() == 4){
                         rightLabel.setTextFill(Color.RED);
                     }
                     
@@ -162,7 +162,7 @@ public class Main extends Application {
                 pen.setStroke(Color.BLACK);
                 // 1 x y  2 x y
                 pen.strokeLine(level.getLeftCannonX(), 700 - level.getLeftCannonY(), event.getX(), event.getY());  // 600 - 238:hin joku yTransform JA tykin sijainti levelistä!!!! 
-            } else if(game.getState() == 3){
+            } else if(game.getState() == 4){
                 Image image = SwingFXUtils.toFXImage(game.getStaticSnapshot(), null);
                 pen.drawImage(image, 0, 0);
                 
@@ -178,7 +178,7 @@ public class Main extends Application {
                 game.setAndFireCannon((int)event.getX() - level.getLeftCannonX(), 700 - (int)event.getY() - level.getLeftCannonY());  // Tähänkin jotkut hienot transformit.
                 leftLabel.setTextFill(Color.BLACK);  // Player's turn is over so the name is colored back to black.
                 simulation.start();
-            } else if(game.getState() == 3){
+            } else if(game.getState() == 4){
                 game.setAndFireCannon((int)event.getX() - level.getRightCannonX(), 700 - (int)event.getY() - level.getRightCannonY());  // Tähänkin jotkut hienot transformit.
                 rightLabel.setTextFill(Color.BLACK);  // Player's turn is over so the name is colored back to black.
                 simulation.start();

@@ -5,6 +5,8 @@ package otmharjoitustyo.logic;
 
 import otmharjoitustyo.domain.Level;
 
+import java.util.Random;
+
 import java.awt.image.BufferedImage;
 import java.awt.Color;
 
@@ -13,12 +15,13 @@ public class Game {
     /*
     States:
     1 = Left player's turn.
-    2 = Simulating the effects of an ammunition shot by the left player.
-    3 = Right player's turn.
-    4 = Simulating the effects of an ammunition shot by the right player.
+    2 = Simulating the trajectory of an ammunition shot by the left player.
+    3 = Explosion simulation of the left player's ammunition.
+    4 = Right player's turn.
+    5 = Simulating the trajectory of an ammunition shot by the right player.
+    6 = Explosion simulation of the right player's ammunition.
     */
     private int state;
-    
     
     
     private Level level;
@@ -38,6 +41,7 @@ public class Game {
     
     private static final int AMMUNITION_RADIUS = 7;
     private static final int EXPLOSION_RADIUS = 50;
+    private static final double EXPLOSION_DURATION = 0.75;
     
     double initialVx;
     double initialVy;
@@ -46,9 +50,10 @@ public class Game {
     int oldAmmunitionX;
     int oldAmmunitionY;
     
-    boolean explosion;
     int explosionX;
     int explosionY;
+    double explosionStartTime;
+    int explosionSeed;
     
     int leftFortressPixelsStart;
     int rightFortressPixelsStart;
@@ -68,12 +73,10 @@ public class Game {
         this.ammunitionMaxY = level.getAmmunitionMaxY();
         this.ammunitionMinY = level.getAmmunitionMinY();
         
-        
         this.gameFieldWithBackground = new BufferedImage(gameField.getWidth(), gameField.getHeight(), BufferedImage.TYPE_INT_RGB);
         initializeGameFieldWithBackground();
         
         this.oldAmmunitionExist = false;
-        this.explosion = false;
         
         this.leftFortressPixelsStart = leftFortressPixels();
         this.rightFortressPixelsStart = rightFortressPixels();
@@ -81,7 +84,7 @@ public class Game {
     
     private void nextState() {
         ++state;
-        if (state == 5) {
+        if (state == 7) {
             state = 1;
         }
     }
@@ -177,11 +180,11 @@ public class Game {
         return (int) ((up1 - up2 + up3) / a);
     }
     
-    // COLOR OR FILLIMAGE!!!!!!!!
-    private boolean insertCircleWithImpactDetectionOption(BufferedImage image, int circleX, int circleY, int radius, Color color, BufferedImage fillImage, boolean detectionON) {
-        int yMax = image.getHeight();
-        int xMax = image.getWidth();
-        
+    // COLOR OR FILLIMAGE!!!!!!!!      // RENAME!!!!!!!!!!
+    private boolean insertCircleWithImpactDetectionOption(BufferedImage image, int xMin, int xMax, int yMin, int yMax, 
+                                                          int circleX, int circleY, int radius, 
+                                                          Color color, BufferedImage fillImage, 
+                                                          boolean detectionON) {
         int y = circleY + radius;
         int x = circleX - radius;
         
@@ -196,11 +199,13 @@ public class Game {
                 if ((x - circleX) * (x - circleX) + (y - circleY) * (y - circleY) <= radius * radius) {
                     
                     // gameField boundary check.        // <= VS <   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                    if (0 < x && x < xMax && 0 < y && y < yMax) {
+                    if (xMin < x && x < xMax && yMin < y && y < yMax) {    // TARGETTIIN????????????????????????????????????????????
+                        
                         if (detectionON && image.getRGB(x, yTransform(y)) != Color.WHITE.getRGB()) {  // Not white == impact into fortress or ground. 
                             return true;
                         }
-                        if(color != null){  // Fill circle with given color.
+                        
+                        if (color != null) {  // Fill circle with given color.
                             image.setRGB(x, yTransform(y), color.getRGB());
                         } else {            // Fill circle with given image.
                             image.setRGB(x, yTransform(y), fillImage.getRGB(x, yTransform(y)));
@@ -219,10 +224,121 @@ public class Game {
         return false;  // No impact detected or impact detection not turned on.
     }
     
+    
+    private int countYellowBuddies(BufferedImage image, int x, int y, int xMin, int xMax, int yMin, int yMax){
+        int count = 0;
+        
+        boolean upOK = y + 1 < yMax;
+        boolean rightOK = x + 1 < xMax;
+        boolean downOK = 0 <= y - 1;
+        boolean leftOK = 0 <= x - 1;
+        
+        int color;
+        if (upOK) {
+            color = image.getRGB(x, yTransform(y + 1));
+            if(color == Color.YELLOW.getRGB()){
+                ++count;
+            }
+        }
+        if (upOK && rightOK) {
+            color = image.getRGB(x + 1, yTransform(y + 1));
+            if(color == Color.YELLOW.getRGB()){
+                ++count;
+            }
+        }
+        if (rightOK) {
+            color = image.getRGB(x + 1, yTransform(y));
+            if(color == Color.YELLOW.getRGB()){
+                ++count;
+            }
+        }
+        if (downOK && rightOK) {
+            color = image.getRGB(x + 1, yTransform(y - 1));
+            if(color == Color.YELLOW.getRGB()){
+                ++count;
+            }
+        }
+        if (downOK) {
+            color = image.getRGB(x, yTransform(y - 1));
+            if(color == Color.YELLOW.getRGB()){
+                ++count;
+            }
+        }
+        if (downOK && leftOK) {
+            color = image.getRGB(x - 1, yTransform(y - 1));
+            if(color == Color.YELLOW.getRGB()){
+                ++count;
+            }
+        }
+        if (leftOK) {
+            color = image.getRGB(x - 1, yTransform(y));
+            if(color == Color.YELLOW.getRGB()){
+                ++count;
+            }
+        }
+        if (upOK && leftOK) {
+            color = image.getRGB(x - 1, yTransform(y + 1));
+            if(color == Color.YELLOW.getRGB()){
+                ++count;
+            }
+        }
+        
+        return count;
+    }
+            
+    // advance päällä: Kasvata keltaista alueta punaisella kaverisääntöjen ja satunnaisuuden perusteella.
+    // pois päältä:    Vaihda punaiset keltaisiksi.
+    private void explosionAdvancer(BufferedImage image, int xMin, int xMax, int yMin, int yMax, 
+                                   int circleX, int circleY, int radius, 
+                                   boolean advance, Color color, Color replace, BufferedImage fillImage) {
+        int y = circleY + radius;
+        int x = circleX - radius;
+        
+        int yTarget = y - 2 * radius; // So y-loop must substract!
+        int xTarget = x + 2 * radius;
+        
+        Random random = new Random(explosionSeed);
+        
+        // Loops which go through a rectangle pixel by pixel that will hold the circle to be drawn.
+        while (y >= yTarget) {
+            while (x <= xTarget) {
+                
+                // (x-x0)2 + (y-y0)2 <= radius2
+                if ((x - circleX) * (x - circleX) + (y - circleY) * (y - circleY) <= radius * radius) {
+                    
+                    // gameField boundary check.        // <= VS <   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    if (xMin < x && x < xMax && yMin < y && y < yMax) {  // TARGETTIIN????????????????????????????????????????????
+                        
+                        if (color != null && replace != null) {
+                            if(image.getRGB(x, yTransform(y)) == color.getRGB()){
+                                image.setRGB(x, yTransform(y), replace.getRGB()); 
+                            }
+                        } else if (color != null && fillImage != null) {
+                            if(image.getRGB(x, yTransform(y)) == color.getRGB()){
+                                image.setRGB(x, yTransform(y), fillImage.getRGB(x, yTransform(y))); 
+                            }
+                        } else if (advance) {
+                             if(image.getRGB(x, yTransform(y)) != Color.YELLOW.getRGB()
+                                && 3 <= countYellowBuddies(image, x, y, xMin, xMax, yMin, yMax) - random.nextInt(3)){
+                                image.setRGB(x, yTransform(y), Color.RED.getRGB()); 
+                             }
+                        }
+                        
+                    }
+                }
+                
+                ++x;
+            }
+            
+            x = circleX - radius;
+            --y;
+        }
+    }
+    
     private void removeOldAmmunitionIfExistent() {
         if (oldAmmunitionExist) {
-            insertCircleWithImpactDetectionOption(gameField, oldAmmunitionX, oldAmmunitionY, AMMUNITION_RADIUS, Color.WHITE, null, false);
-            insertCircleWithImpactDetectionOption(gameFieldWithBackground, oldAmmunitionX, oldAmmunitionY, AMMUNITION_RADIUS, null, background, false);
+            insertCircleWithImpactDetectionOption(gameField, 0, gameField.getWidth(), 0, gameField.getHeight(), oldAmmunitionX, oldAmmunitionY, AMMUNITION_RADIUS, Color.WHITE, null, false);
+            insertCircleWithImpactDetectionOption(gameFieldWithBackground, 0, gameFieldWithBackground.getWidth(), 0, gameFieldWithBackground.getHeight(), oldAmmunitionX, oldAmmunitionY, AMMUNITION_RADIUS, null, background, false);
             oldAmmunitionExist = false;
         }
     }
@@ -251,50 +367,138 @@ public class Game {
     }
     
     public BufferedImage getSimulationSnapshot(double seconds) {
-        if (state != 2 && state != 4) {
+        if (state == 2 || state == 5) {  // Trajectory simulation.
+            
+            // Jos ammuksella vanha sijainti niin poistetaan vanhat pixelit.
+            removeOldAmmunitionIfExistent();
+
+            // Lasketaan uusi ammuksen sijainti.
+            int ammunitionX = ammunitionXwithDrag(seconds);
+            int ammunitionY = ammunitionYwithDrag(seconds);
+
+            // Tarkastetaan rajat:
+            // jos vasen, oikea tai alaraja yli niin palautetaan tyhjä ja muutetaan pelin tilaa.
+            if (ammunitionX < -AMMUNITION_RADIUS || gameField.getWidth() + AMMUNITION_RADIUS < ammunitionX || ammunitionY < -AMMUNITION_RADIUS) {
+                nextState();
+                nextState();  // Two nextStates because there is no ammunition explosion.
+                return gameFieldWithBackground;
+            }
+
+
+            // Tarkastetaan osuma linnoihin ja maahan samalla kun piirretään ammuksen uutta paikkaa.
+            boolean impact = insertCircleWithImpactDetectionOption(gameField, 0, gameField.getWidth(), 0, gameField.getHeight(), ammunitionX, ammunitionY, AMMUNITION_RADIUS, Color.RED, null, true);
+            insertCircleWithImpactDetectionOption(gameFieldWithBackground, 0, gameFieldWithBackground.getWidth(), 0, gameFieldWithBackground.getHeight(), ammunitionX, ammunitionY, AMMUNITION_RADIUS, Color.RED, null, false);
+
+            boolean gameFieldHardBoundaryImpact = level.isVacuumPossible() && 
+                    (ammunitionY > level.getAmmunitionMaxY() - AMMUNITION_RADIUS || 
+                     ammunitionY < level.getAmmunitionMinY() + AMMUNITION_RADIUS);
+
+            // Jos osui maahan tai linnaan.
+            if (impact || gameFieldHardBoundaryImpact) {
+                // Alussa gWb asettaan punanen pallo
+                // ja g asetetaan punanen pallo
+                // ja arvotaan seed.
+                insertCircleWithImpactDetectionOption(gameField, 0, gameField.getWidth(), 0, gameField.getHeight(), ammunitionX, ammunitionY, AMMUNITION_RADIUS, Color.RED, null, false);
+                insertCircleWithImpactDetectionOption(gameFieldWithBackground, 0, gameFieldWithBackground.getWidth(), 0, gameFieldWithBackground.getHeight(), ammunitionX, ammunitionY, AMMUNITION_RADIUS, Color.RED, null, false);
+                explosionSeed = new Random().nextInt();
+                
+                oldAmmunitionExist = false;
+                
+
+                nextState();
+
+                explosionX = ammunitionX;
+                explosionY = ammunitionY;
+                explosionStartTime = seconds;
+                
+            } else {
+                oldAmmunitionExist = true;
+                oldAmmunitionX = ammunitionX;
+                oldAmmunitionY = ammunitionY;
+            }
+
+            return gameFieldWithBackground;
+            
+        } else if (state == 3 || state == 6) {  // Explosion simulation.
+            
+            if(seconds < explosionStartTime + EXPLOSION_DURATION){
+                // punaset keltasiks.
+                // punasien lisäys
+                // MOLEMPIIN!
+                
+                explosionAdvancer(gameField, 0, gameField.getWidth(), 0, gameField.getHeight(), 
+                                  explosionX, explosionY, EXPLOSION_RADIUS, 
+                                  false, Color.RED, Color.YELLOW, null);
+                explosionAdvancer(gameFieldWithBackground, 0, gameFieldWithBackground.getWidth(), 0, gameFieldWithBackground.getHeight(), 
+                                  explosionX, explosionY, EXPLOSION_RADIUS, 
+                                  false, Color.RED, Color.YELLOW, null);
+                
+                explosionAdvancer(gameField, 0, gameField.getWidth(), 0, gameField.getHeight(), 
+                                  explosionX, explosionY, EXPLOSION_RADIUS, 
+                                  true, null, null, null);
+                explosionAdvancer(gameFieldWithBackground, 0, gameFieldWithBackground.getWidth(), 0, gameFieldWithBackground.getHeight(), 
+                                  explosionX, explosionY, EXPLOSION_RADIUS, 
+                                  true, null, null, null);
+                
+                
+                //2x
+                explosionAdvancer(gameField, 0, gameField.getWidth(), 0, gameField.getHeight(), 
+                                  explosionX, explosionY, EXPLOSION_RADIUS, 
+                                  false, Color.RED, Color.YELLOW, null);
+                explosionAdvancer(gameFieldWithBackground, 0, gameFieldWithBackground.getWidth(), 0, gameFieldWithBackground.getHeight(), 
+                                  explosionX, explosionY, EXPLOSION_RADIUS, 
+                                  false, Color.RED, Color.YELLOW, null);
+                
+                explosionAdvancer(gameField, 0, gameField.getWidth(), 0, gameField.getHeight(), 
+                                  explosionX, explosionY, EXPLOSION_RADIUS, 
+                                  true, null, null, null);
+                explosionAdvancer(gameFieldWithBackground, 0, gameFieldWithBackground.getWidth(), 0, gameFieldWithBackground.getHeight(), 
+                                  explosionX, explosionY, EXPLOSION_RADIUS, 
+                                  true, null, null, null);
+                
+                //3x
+                explosionAdvancer(gameField, 0, gameField.getWidth(), 0, gameField.getHeight(), 
+                                  explosionX, explosionY, EXPLOSION_RADIUS, 
+                                  false, Color.RED, Color.YELLOW, null);
+                explosionAdvancer(gameFieldWithBackground, 0, gameFieldWithBackground.getWidth(), 0, gameFieldWithBackground.getHeight(), 
+                                  explosionX, explosionY, EXPLOSION_RADIUS, 
+                                  false, Color.RED, Color.YELLOW, null);
+                
+                explosionAdvancer(gameField, 0, gameField.getWidth(), 0, gameField.getHeight(), 
+                                  explosionX, explosionY, EXPLOSION_RADIUS, 
+                                  true, null, null, null);
+                explosionAdvancer(gameFieldWithBackground, 0, gameFieldWithBackground.getWidth(), 0, gameFieldWithBackground.getHeight(), 
+                                  explosionX, explosionY, EXPLOSION_RADIUS, 
+                                  true, null, null, null);
+            } else {
+                // Lopussa gWb keltaset ja punaset täytetään backgroundilla
+                // ja g keltaset ja punaset täytetään täytetään valkosella.
+                
+                // Eka punaset keltasiks niin tarvii korvata vaan punaset.
+                explosionAdvancer(gameField, 0, gameField.getWidth(), 0, gameField.getHeight(), 
+                                  explosionX, explosionY, EXPLOSION_RADIUS, 
+                                  false, Color.RED, Color.YELLOW, null);
+                explosionAdvancer(gameFieldWithBackground, 0, gameFieldWithBackground.getWidth(), 0, gameFieldWithBackground.getHeight(), 
+                                  explosionX, explosionY, EXPLOSION_RADIUS, 
+                                  false, Color.RED, Color.YELLOW, null);
+                
+                explosionAdvancer(gameField, 0, gameField.getWidth(), 0, gameField.getHeight(), 
+                                  explosionX, explosionY, EXPLOSION_RADIUS, 
+                                  false, Color.YELLOW, Color.WHITE, null);
+                explosionAdvancer(gameFieldWithBackground, 0, gameFieldWithBackground.getWidth(), 0, gameFieldWithBackground.getHeight(), 
+                                  explosionX, explosionY, EXPLOSION_RADIUS, 
+                                  false, Color.YELLOW, null, background);
+                
+                nextState();
+            }
+            
+            return gameFieldWithBackground;
+            
+        } else if (state == 1 || state == 4) {  // Signal that trajectory and explosion simulations have ended.
             return null;
         }
         
-        // Jos ammuksella vanha sijainti niin poistetaan vanhat pixelit.
-        removeOldAmmunitionIfExistent();
-        
-        // Lasketaan uusi ammuksen sijainti.
-        int ammunitionX = ammunitionXwithDrag(seconds);
-        int ammunitionY = ammunitionYwithDrag(seconds);
-        
-        // Tarkastetaan rajat:
-        // jos vasen, oikea tai alaraja yli niin palautetaan tyhjä ja muutetaan pelin tilaa.
-        if (ammunitionX < -AMMUNITION_RADIUS || gameField.getWidth() + AMMUNITION_RADIUS < ammunitionX || ammunitionY < -AMMUNITION_RADIUS) {
-            nextState();
-            return gameFieldWithBackground;
-        }
-       
-        
-        boolean impact = false;
-        
-        // Tarkastetaan osuma linnoihin ja maahan samalla kun piirretään ammuksen uutta paikkaa.
-        impact = insertCircleWithImpactDetectionOption(gameField, ammunitionX, ammunitionY, AMMUNITION_RADIUS, Color.RED, null, true);
-        insertCircleWithImpactDetectionOption(gameFieldWithBackground, ammunitionX, ammunitionY, AMMUNITION_RADIUS, Color.RED, null, false);
-        
-        // Jos osui maahan tai linnaan.
-        if (impact) {
-            // Poistetaan linnapixelit räjähdysalueelta ja samalla ammus:
-            insertCircleWithImpactDetectionOption(gameField, ammunitionX, ammunitionY, EXPLOSION_RADIUS, Color.WHITE, null, false);
-            insertCircleWithImpactDetectionOption(gameFieldWithBackground, ammunitionX, ammunitionY, EXPLOSION_RADIUS, null, background, false);
-            oldAmmunitionExist = false;
-            
-            nextState();
-            
-            explosion = true;
-            explosionX = ammunitionX;
-            explosionY = ammunitionY;
-        } else {
-            oldAmmunitionExist = true;
-            oldAmmunitionX = ammunitionX;
-            oldAmmunitionY = ammunitionY;
-        }
-        
-        return gameFieldWithBackground;
+        return null;  // this should never be reached.
     }
      
     public BufferedImage getStaticSnapshot() {
@@ -305,13 +509,6 @@ public class Game {
         this.initialVx = initialVx;
         this.initialVy = initialVy;
         nextState();
-    }
-    
-    public int[] explosionCoordinates() {
-        if (explosion) {
-            return new int[]{explosionX, explosionY};
-        }
-        return null;
     }
     
     public int getState() {
