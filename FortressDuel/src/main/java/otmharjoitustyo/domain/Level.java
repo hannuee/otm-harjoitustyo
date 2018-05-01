@@ -8,6 +8,8 @@ import java.awt.image.BufferedImage;
 public class Level {
     
     private String name;
+    private BufferedImage thumbnail;
+    private BufferedImage thumbnailHover;
     private BufferedImage gameField;
     private BufferedImage background;
     
@@ -31,12 +33,14 @@ public class Level {
     private int ammunitionMaxY;
     private int ammunitionMinY;
     
-    public Level(String name, BufferedImage gameField, BufferedImage background, 
+    public Level(String name, BufferedImage thumbnail, BufferedImage thumbnailHover, BufferedImage gameField, BufferedImage background, 
                  int leftCannonX, int leftCannonY, int rightCannonX, int rightCannonY, 
                  int leftFortressMaxX, int leftFortressMinX, int leftFortressMaxY, int leftFortressMinY, 
                  int rightFortressMaxX, int rightFortressMinX, int rightFortressMaxY, int rightFortressMinY, 
                  boolean vacuumPossible, int ammunitionMaxY, int ammunitionMinY) {
         this.name = name;
+        this.thumbnail = thumbnail;
+        this.thumbnailHover = thumbnailHover;
         this.gameField = gameField;
         this.background = background;
         
@@ -60,8 +64,23 @@ public class Level {
         this.ammunitionMinY = ammunitionMinY;
     }
     
+    // For listing.
+    public Level(String name, BufferedImage thumbnail, BufferedImage thumbnailHover) {
+        this.name = name;
+        this.thumbnail = thumbnail;
+        this.thumbnailHover = thumbnailHover;
+    }
+    
     public String getName() {
         return this.name;
+    }
+    
+    public BufferedImage getThumbnail() {
+        return this.thumbnail;
+    }
+    
+    public BufferedImage getThumbnailHover() {
+        return this.thumbnailHover;
     }
     
     public BufferedImage getGameField() {

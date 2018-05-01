@@ -57,6 +57,8 @@ public class Game {
     
     int leftFortressPixelsStart;
     int rightFortressPixelsStart;
+    
+    boolean vacuum;
 
     public Game(Level level) {
         this.state = 1;
@@ -80,6 +82,8 @@ public class Game {
         
         this.leftFortressPixelsStart = leftFortressPixels();
         this.rightFortressPixelsStart = rightFortressPixels();
+        
+        this.vacuum = false;
     }
     
     private void nextState() {
@@ -373,8 +377,15 @@ public class Game {
             removeOldAmmunitionIfExistent();
 
             // Lasketaan uusi ammuksen sijainti.
-            int ammunitionX = ammunitionXwithDrag(seconds);
-            int ammunitionY = ammunitionYwithDrag(seconds);
+            int ammunitionX;
+            int ammunitionY;
+            if(vacuum){
+                ammunitionX = ammunitionX(seconds);
+                ammunitionY = ammunitionY(seconds);
+            } else {
+                ammunitionX = ammunitionXwithDrag(seconds);
+                ammunitionY = ammunitionYwithDrag(seconds);
+            }
 
             // Tarkastetaan rajat:
             // jos vasen, oikea tai alaraja yli niin palautetaan tyhjä ja muutetaan pelin tilaa.
@@ -384,6 +395,12 @@ public class Game {
                 return gameFieldWithBackground;
             }
 
+            // Trace for Vacuum chamber level.
+            if (level.isVacuumPossible()) {
+                if (0 < ammunitionX && ammunitionX < background.getWidth() && 0 < ammunitionY && ammunitionY < background.getHeight()) {
+                    background.setRGB(ammunitionX, yTransform(ammunitionY), Color.BLACK.getRGB());
+                }
+            }
 
             // Tarkastetaan osuma linnoihin ja maahan samalla kun piirretään ammuksen uutta paikkaa.
             boolean impact = insertCircleWithImpactDetectionOption(gameField, 0, gameField.getWidth(), 0, gameField.getHeight(), ammunitionX, ammunitionY, AMMUNITION_RADIUS, Color.RED, null, true);
@@ -509,6 +526,16 @@ public class Game {
         this.initialVx = initialVx;
         this.initialVy = initialVy;
         nextState();
+    }
+    
+    public void setVacuum(boolean vacuum){
+        if(level.isVacuumPossible() && (state == 1 || state == 4)) {
+            this.vacuum = vacuum;
+        }
+    }
+    
+    public boolean getVacuum(){
+        return this.vacuum;
     }
     
     public int getState() {

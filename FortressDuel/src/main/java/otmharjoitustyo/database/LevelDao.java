@@ -34,6 +34,8 @@ public class LevelDao {
         if (result.next()) {
             
             BufferedImage gameField = ImageIO.read(result.getBinaryStream("gameField"));
+            BufferedImage thumbnail = ImageIO.read(result.getBinaryStream("thumbnail"));
+            BufferedImage thumbnailHover = ImageIO.read(result.getBinaryStream("thumbnailHover"));
             BufferedImage background = ImageIO.read(result.getBinaryStream("background"));
             
             int leftCannonX = result.getInt("leftCannonX");
@@ -59,7 +61,7 @@ public class LevelDao {
             statement.close();
             connection.close();
             
-            return new Level(name, gameField, background, 
+            return new Level(name, thumbnail, thumbnailHover, gameField, background, 
                  leftCannonX, leftCannonY, rightCannonX, rightCannonY, 
                  leftFortressMaxX, leftFortressMinX, leftFortressMaxY, leftFortressMinY, 
                  rightFortressMaxX, rightFortressMinX, rightFortressMaxY, rightFortressMinY, 
@@ -75,26 +77,28 @@ public class LevelDao {
         }
     }
     
-    // returns a list of level names.
-    public ArrayList<String> listAll() throws SQLException, IOException {
+    // returns a list of levels with only names, thumbnails and thumbnailsHovers.
+    public ArrayList<Level> listAll() throws SQLException, IOException {
         Connection connection = this.database.getConnection();
-        PreparedStatement statement = connection.prepareStatement("SELECT name FROM Level");
+        PreparedStatement statement = connection.prepareStatement("SELECT name, thumbnail, thumbnailHover FROM Level");
         
         ResultSet result = statement.executeQuery();
         
-        ArrayList<String> levelNames = new ArrayList<>();
+        ArrayList<Level> levels = new ArrayList<>();
         
         while (result.next()) {
             String name = result.getString("name");
+            BufferedImage thumbnail = ImageIO.read(result.getBinaryStream("thumbnail"));
+            BufferedImage thumbnailHover = ImageIO.read(result.getBinaryStream("thumbnailHover"));
             
-            levelNames.add(name);
+            levels.add(new Level(name, thumbnail, thumbnailHover));
         } 
             
         result.close();
         statement.close();
         connection.close();
         
-        return levelNames;
+        return levels;
     }
     
 }
