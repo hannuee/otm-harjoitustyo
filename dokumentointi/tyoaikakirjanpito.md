@@ -35,11 +35,23 @@
 | 23.4  |  6.50  | ^samaa. |
 | 23.4  |  0.18  | Lis‰tty testej‰. |
 | 24.4  |  3.00  | Lis‰tty alkeellinen scoreboard, pieni refaktorointi, korjattu checkstylen kehoittamia pieni‰ asioita, release, README.md p‰ivitys, sekvenssikaavio ja tyˆaikakirjanpidon p‰ivitys. |
-| yht   | 70.99 | | 
+
+| 27.4  |  2.00  | Infolaatikko pelikent‰n alle jossa vuoron indikointi ja linnoitusten terveys ja sen vaatimat palvelut Game-luokkaan + hieman refaktorointia. |
+| 27.4  |  1.00  | Taustakuvan lis‰‰minen pelikentt‰‰n. |
+| 27.4  |  1.00  | Toteutettu Vacuum chamber kent‰n kovat rajat |
+| 28.4  |  2.5  | Ammuksen visuaalinen r‰j‰hdys. |
+| 29.4  |  3.75  | ^samaa. |
+| 30.4  |  1.16  | Nappi jolla saa imetty‰ ilman pois vacuum chamber kent‰ss‰. |
+| 30.4  |  3.00  | Informaatio tykin suunnasta ja ammuksen alkunopeudesta. |
+| 30.4  |  1.00  | Vacuum chamber kent‰ss‰ ammusten vanat sek‰ aiemmilla asetuksilla ampuminen -nappi. |
+| 1.5  |  0.40  | Exit nappi peliin |
+| 1.5  |  5.20  | Grafiikkojen parannus sek‰ vaaditut tietokanta- ja koodimuutokset. |
+| 2.5  |  7.25  | Graafista hiontaa, estetty 2 samannimisen pelaajan peli toisiaan vastaan, iconit, refaktorointia, Checkstyle-korjauksia, lis‰tty testej‰. |
+| yht   | 99.25 | | 
 
 
 
 Yll‰olevat tunnit selkeit‰ tyˆtunteja jolloin tehty sovellusta tietokoneen ‰‰rell‰.
 
-N‰iden tuntien lis‰ksi kertynyt t‰h‰n menness‰ karkean arvion mukaan n. 21 tuntia pohdinta-aikaa, eli pohdittu sovelluksen rakennetta, toimintaa ja toteutusta joko pelk‰st‰‰n tai samalla kun tehty jotain muuta, esim. arkisia askareita.
+N‰iden tuntien lis‰ksi kertynyt t‰h‰n menness‰ karkean arvion mukaan n. 30 tuntia pohdinta-aikaa, eli pohdittu sovelluksen rakennetta, toimintaa ja toteutusta joko pelk‰st‰‰n tai samalla kun tehty jotain muuta, esim. arkisia askareita.
 
