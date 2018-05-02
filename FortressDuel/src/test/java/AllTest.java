@@ -39,6 +39,16 @@ public class AllTest {
     }
     
     @Test
+    public void databaseListsAllLevels() throws SQLException, IOException {
+        Database database = new Database("jdbc:sqlite:Gamedata.db");
+        LevelDao levelDao = new LevelDao(database);
+        
+        ArrayList<Level> levels = levelDao.listAll();
+        
+        assertEquals(3, levels.size());
+    }
+    
+    @Test
     public void databaseReturnsCorrectPlayer() throws SQLException, IOException {
         Database database = new Database("jdbc:sqlite:Gamedata.db");
         PlayerDao playerDao = new PlayerDao(database);
@@ -54,6 +64,14 @@ public class AllTest {
         
         ArrayList<Player> players = playerDao.findWinners();
         assertEquals(5, players.size());
+    }
+    
+    
+    // ImageOperations:
+    
+    @Test
+    public void yellowBuddieCounterCountsZero() {
+        assertEquals(0, ImageOperations.countYellowBuddies(level.getGameField(), 50, 50, 0, level.getGameField().getWidth(), 0, level.getGameField().getHeight()));
     }
     
     

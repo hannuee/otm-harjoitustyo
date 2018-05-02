@@ -450,7 +450,7 @@ public class Main extends Application {
         
         
         
-        File logoFile = new File("Graphics/logo.png");
+        File logoFile = new File("Graphics/logo.png"); 
         FileInputStream inputstream2 = new FileInputStream(logoFile); 
         Image logo = new Image(inputstream2);
         ImageView logoView = new ImageView(logo);

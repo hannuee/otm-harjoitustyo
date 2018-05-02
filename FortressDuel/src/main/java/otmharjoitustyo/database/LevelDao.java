@@ -23,6 +23,30 @@ public class LevelDao {
     public LevelDao(Database database) {
         this.database = database;
     }
+    
+    public Level resultSetToLevel(ResultSet result) throws SQLException, IOException {
+        String name = result.getString("name");
+        BufferedImage gameField = ImageIO.read(result.getBinaryStream("gameField"));
+        BufferedImage thumbnail = ImageIO.read(result.getBinaryStream("thumbnail"));
+        BufferedImage thumbnailHover = ImageIO.read(result.getBinaryStream("thumbnailHover"));
+        BufferedImage background = ImageIO.read(result.getBinaryStream("background"));
+
+        int leftCannonX = result.getInt("leftCannonX");
+        int leftCannonY = result.getInt("leftCannonY");
+        int rightCannonX = result.getInt("rightCannonX"); 
+        int rightCannonY = result.getInt("rightCannonY"); 
+
+        int leftFortressMaxX = result.getInt("leftFortressMaxX"); 
+        int leftFortressMinX = result.getInt("leftFortressMinX"); 
+        int leftFortressMaxY = result.getInt("leftFortressMaxY"); 
+        int leftFortressMinY = result.getInt("leftFortressMinY"); 
+
+        return new Level(name, thumbnail, thumbnailHover, gameField, background, 
+                 leftCannonX, leftCannonY, rightCannonX, rightCannonY, 
+                 leftFortressMaxX, leftFortressMinX, leftFortressMaxY, leftFortressMinY, 
+                 result.getInt("rightFortressMaxX"), result.getInt("rightFortressMinX"), result.getInt("rightFortressMaxY"), result.getInt("rightFortressMinY"), 
+                 result.getBoolean("vacuumPossible"), result.getInt("ammunitionMaxY"), result.getInt("ammunitionMinY"));
+    }
    
     public Level findOne(String name) throws SQLException, IOException {
         Connection connection = this.database.getConnection();
@@ -33,39 +57,13 @@ public class LevelDao {
         
         if (result.next()) {
             
-            BufferedImage gameField = ImageIO.read(result.getBinaryStream("gameField"));
-            BufferedImage thumbnail = ImageIO.read(result.getBinaryStream("thumbnail"));
-            BufferedImage thumbnailHover = ImageIO.read(result.getBinaryStream("thumbnailHover"));
-            BufferedImage background = ImageIO.read(result.getBinaryStream("background"));
-            
-            int leftCannonX = result.getInt("leftCannonX");
-            int leftCannonY = result.getInt("leftCannonY");
-            int rightCannonX = result.getInt("rightCannonX"); 
-            int rightCannonY = result.getInt("rightCannonY"); 
-
-            int leftFortressMaxX = result.getInt("leftFortressMaxX"); 
-            int leftFortressMinX = result.getInt("leftFortressMinX"); 
-            int leftFortressMaxY = result.getInt("leftFortressMaxY"); 
-            int leftFortressMinY = result.getInt("leftFortressMinY"); 
-
-            int rightFortressMaxX = result.getInt("rightFortressMaxX"); 
-            int rightFortressMinX = result.getInt("rightFortressMinX"); 
-            int rightFortressMaxY = result.getInt("rightFortressMaxY"); 
-            int rightFortressMinY = result.getInt("rightFortressMinY"); 
-
-            boolean vacuumPossible = result.getBoolean("vacuumPossible");
-            int ammunitionMaxY = result.getInt("ammunitionMaxY"); 
-            int ammunitionMinY = result.getInt("ammunitionMinY");
+            Level resultLevel = resultSetToLevel(result);
             
             result.close();
             statement.close();
             connection.close();
             
-            return new Level(name, thumbnail, thumbnailHover, gameField, background, 
-                 leftCannonX, leftCannonY, rightCannonX, rightCannonY, 
-                 leftFortressMaxX, leftFortressMinX, leftFortressMaxY, leftFortressMinY, 
-                 rightFortressMaxX, rightFortressMinX, rightFortressMaxY, rightFortressMinY, 
-                 vacuumPossible, ammunitionMaxY, ammunitionMinY);
+            return resultLevel;
             
         } else {
             

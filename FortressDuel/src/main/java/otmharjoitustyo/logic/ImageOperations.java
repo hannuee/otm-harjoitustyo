@@ -67,4 +67,65 @@ public class ImageOperations {
         return nonWhitePixelsOverwritten;
     }
     
+    public static int countYellowBuddies(BufferedImage image, int x, int y, int xMin, int xMax, int yMin, int yMax) {
+        int count = 0;
+        
+        boolean upOK = y + 1 < yMax;
+        boolean rightOK = x + 1 < xMax;
+        boolean downOK = 0 <= y - 1;
+        boolean leftOK = 0 <= x - 1;
+        
+        int color;
+        if (upOK) {
+            color = image.getRGB(x, yTransform(image.getHeight(), y + 1));
+            if (color == Color.YELLOW.getRGB()) {
+                ++count;
+            }
+        }
+        if (upOK && rightOK) {
+            color = image.getRGB(x + 1, yTransform(image.getHeight(), y + 1));
+            if (color == Color.YELLOW.getRGB()) {
+                ++count;
+            }
+        }
+        if (rightOK) {
+            color = image.getRGB(x + 1, yTransform(image.getHeight(), y));
+            if (color == Color.YELLOW.getRGB()) {
+                ++count;
+            }
+        }
+        if (downOK && rightOK) {
+            color = image.getRGB(x + 1, yTransform(image.getHeight(), y - 1));
+            if (color == Color.YELLOW.getRGB()) {
+                ++count;
+            }
+        }
+        if (downOK) {
+            color = image.getRGB(x, yTransform(image.getHeight(), y - 1));
+            if (color == Color.YELLOW.getRGB()) {
+                ++count;
+            }
+        }
+        if (downOK && leftOK) {
+            color = image.getRGB(x - 1, yTransform(image.getHeight(), y - 1));
+            if (color == Color.YELLOW.getRGB()) {
+                ++count;
+            }
+        }
+        if (leftOK) {
+            color = image.getRGB(x - 1, yTransform(image.getHeight(), y));
+            if (color == Color.YELLOW.getRGB()) {
+                ++count;
+            }
+        }
+        if (upOK && leftOK) {
+            color = image.getRGB(x - 1, yTransform(image.getHeight(), y + 1));
+            if (color == Color.YELLOW.getRGB()) {
+                ++count;
+            }
+        }
+        
+        return count;
+    }
+    
 }
