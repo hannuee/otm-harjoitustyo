@@ -35,6 +35,7 @@ public class Game {
     private int rightCannonY;
     private int ammunitionMaxY;
     private int ammunitionMinY;
+    boolean vacuum;
     
     
     private BufferedImage gameFieldWithBackground;
@@ -57,8 +58,6 @@ public class Game {
     
     int leftFortressPixelsStart;
     int rightFortressPixelsStart;
-    
-    boolean vacuum;
 
     public Game(Level level) {
         this.state = 1;
@@ -184,51 +183,6 @@ public class Game {
         return (int) ((up1 - up2 + up3) / a);
     }
     
-    // COLOR OR FILLIMAGE!!!!!!!!      // RENAME!!!!!!!!!!
-    private boolean insertCircleWithImpactDetectionOption(BufferedImage image, int xMin, int xMax, int yMin, int yMax, 
-                                                          int circleX, int circleY, int radius, 
-                                                          Color color, BufferedImage fillImage, 
-                                                          boolean detectionON) {
-        int y = circleY + radius;
-        int x = circleX - radius;
-        
-        int yTarget = y - 2 * radius; // So y-loop must substract!
-        int xTarget = x + 2 * radius;
-        
-        // Loops which go through a rectangle pixel by pixel that will hold the circle to be drawn.
-        while (y >= yTarget) {
-            while (x <= xTarget) {
-                
-                // (x-x0)2 + (y-y0)2 <= radius2
-                if ((x - circleX) * (x - circleX) + (y - circleY) * (y - circleY) <= radius * radius) {
-                    
-                    // gameField boundary check.        // <= VS <   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                    if (xMin < x && x < xMax && yMin < y && y < yMax) {    // TARGETTIIN????????????????????????????????????????????
-                        
-                        if (detectionON && image.getRGB(x, yTransform(y)) != Color.WHITE.getRGB()) {  // Not white == impact into fortress or ground. 
-                            return true;
-                        }
-                        
-                        if (color != null) {  // Fill circle with given color.
-                            image.setRGB(x, yTransform(y), color.getRGB());
-                        } else {            // Fill circle with given image.
-                            image.setRGB(x, yTransform(y), fillImage.getRGB(x, yTransform(y)));
-                        }
-                        
-                    }
-                }
-                
-                ++x;
-            }
-            
-            x = circleX - radius;
-            --y;
-        }
-        
-        return false;  // No impact detected or impact detection not turned on.
-    }
-    
-    
     private int countYellowBuddies(BufferedImage image, int x, int y, int xMin, int xMax, int yMin, int yMax){
         int count = 0;
         
@@ -341,8 +295,8 @@ public class Game {
     
     private void removeOldAmmunitionIfExistent() {
         if (oldAmmunitionExist) {
-            insertCircleWithImpactDetectionOption(gameField, 0, gameField.getWidth(), 0, gameField.getHeight(), oldAmmunitionX, oldAmmunitionY, AMMUNITION_RADIUS, Color.WHITE, null, false);
-            insertCircleWithImpactDetectionOption(gameFieldWithBackground, 0, gameFieldWithBackground.getWidth(), 0, gameFieldWithBackground.getHeight(), oldAmmunitionX, oldAmmunitionY, AMMUNITION_RADIUS, null, background, false);
+            ImageOperations.insertCircle(gameField, oldAmmunitionX, oldAmmunitionY, AMMUNITION_RADIUS, Color.WHITE, null);
+            ImageOperations.insertCircle(gameFieldWithBackground, oldAmmunitionX, oldAmmunitionY, AMMUNITION_RADIUS, null, background);
             oldAmmunitionExist = false;
         }
     }
@@ -403,8 +357,8 @@ public class Game {
             }
 
             // Tarkastetaan osuma linnoihin ja maahan samalla kun piirretään ammuksen uutta paikkaa.
-            boolean impact = insertCircleWithImpactDetectionOption(gameField, 0, gameField.getWidth(), 0, gameField.getHeight(), ammunitionX, ammunitionY, AMMUNITION_RADIUS, Color.RED, null, true);
-            insertCircleWithImpactDetectionOption(gameFieldWithBackground, 0, gameFieldWithBackground.getWidth(), 0, gameFieldWithBackground.getHeight(), ammunitionX, ammunitionY, AMMUNITION_RADIUS, Color.RED, null, false);
+            boolean impact = ImageOperations.insertCircle(gameField, ammunitionX, ammunitionY, AMMUNITION_RADIUS, Color.RED, null);
+            ImageOperations.insertCircle(gameFieldWithBackground,  ammunitionX, ammunitionY, AMMUNITION_RADIUS, Color.RED, null);
 
             boolean gameFieldHardBoundaryImpact = level.isVacuumPossible() && 
                     (ammunitionY > level.getAmmunitionMaxY() - AMMUNITION_RADIUS || 
@@ -412,16 +366,11 @@ public class Game {
 
             // Jos osui maahan tai linnaan.
             if (impact || gameFieldHardBoundaryImpact) {
-                // Alussa gWb asettaan punanen pallo
-                // ja g asetetaan punanen pallo
-                // ja arvotaan seed.
-                insertCircleWithImpactDetectionOption(gameField, 0, gameField.getWidth(), 0, gameField.getHeight(), ammunitionX, ammunitionY, AMMUNITION_RADIUS, Color.RED, null, false);
-                insertCircleWithImpactDetectionOption(gameFieldWithBackground, 0, gameFieldWithBackground.getWidth(), 0, gameFieldWithBackground.getHeight(), ammunitionX, ammunitionY, AMMUNITION_RADIUS, Color.RED, null, false);
+                
                 explosionSeed = new Random().nextInt();
                 
-                oldAmmunitionExist = false;
+                oldAmmunitionExist = false;  // Because red ammunitions are now considered as explosion graphics.
                 
-
                 nextState();
 
                 explosionX = ammunitionX;

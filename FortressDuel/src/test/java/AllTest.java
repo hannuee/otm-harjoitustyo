@@ -53,7 +53,7 @@ public class AllTest {
         PlayerDao playerDao = new PlayerDao(database);
         
         ArrayList<Player> players = playerDao.findWinners();
-        assertEquals(2, players.size());
+        assertEquals(5, players.size());
     }
     
     
