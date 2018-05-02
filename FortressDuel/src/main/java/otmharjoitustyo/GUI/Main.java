@@ -316,29 +316,33 @@ public class Main extends Application {
         stage.setScene(gameScene);
     }
     
-    private void buildAndSetNameEntryScene(Stage stage, String levelName) {
-        Label leftSideLabel = new Label("Nickname of the player on the left side:");
+    private void buildAndSetNameEntryScene(Stage stage, String levelName, String errorMessage) {
+        Label leftSideLabel = new Label("Nickname of the left player:");
         TextField leftSideNickname = new TextField();
         leftSideNickname.setMaxWidth(220.00);
         
-        Label rightSideLabel = new Label("Nickname of the player on the right side:");
+        Label rightSideLabel = new Label("Nickname of the right player:");
         TextField rightSideNickname = new TextField();
         rightSideNickname.setMaxWidth(220.00);
         
         Button startButton = new Button("Start The Game!");
         startButton.setOnAction((event) -> {
             Level level = null;
-            Game game = null;
             try{
                 level = levelDao.findOne(levelName);
-                game = new Game(level);
             } catch(Exception e){
                 //System.out.println("Error while loading the level!");  // MUUTA GRAAFISEKS?!?!?!?!?!
             }
+            Game game = new Game(level);
             
             
-            String leftPlayerNickname = leftSideNickname.getText();   // TARKASTA ETTÄ EI OLE SAMA NIMI!!!!!!!!!
+            String leftPlayerNickname = leftSideNickname.getText();
             String rightPlayerNickname = rightSideNickname.getText(); 
+            if (leftPlayerNickname.equals(rightPlayerNickname)) {
+                buildAndSetNameEntryScene(stage, levelName, "The nicknames can not be the same!");
+                return;
+            }
+            
             Player leftPlayer = null;
             Player rightPlayer = null;
             try{
@@ -360,15 +364,20 @@ public class Main extends Application {
             buildAndSetGameScene(stage, game, level, leftPlayer, rightPlayer);
         });
         
+        Label errorLabel = null;
+        if (errorMessage != null) {
+            errorLabel = new Label(errorMessage);
+            errorLabel.setStyle("-fx-font: 10px Verdana; -fx-text-fill: RED;");
+        }
+        
         VBox vbox = new VBox();
-        vbox.setPrefSize(300, 180);
+        vbox.setPrefHeight(270);
         vbox.setSpacing(10);
         vbox.setPadding(new Insets(30, 30, 30, 30));
-        vbox.getChildren().add(leftSideLabel);
-        vbox.getChildren().add(leftSideNickname);
-        vbox.getChildren().add(rightSideLabel);
-        vbox.getChildren().add(rightSideNickname);
-        vbox.getChildren().add(startButton);
+        vbox.getChildren().addAll(leftSideLabel, leftSideNickname, rightSideLabel, rightSideNickname, startButton);
+        if (errorMessage != null) {
+            vbox.getChildren().add(errorLabel);
+        }
         
         Scene nameEntryScene = new Scene(vbox);
         stage.setScene(nameEntryScene);
@@ -398,11 +407,27 @@ public class Main extends Application {
             });
             
             thumbnailView.setOnMouseClicked((event) -> {
-                buildAndSetNameEntryScene(stage, level.getName());
+                buildAndSetNameEntryScene(stage, level.getName(), null);
             });
             
             vboxLevels.getChildren().add(thumbnailView);
         }
+        
+        
+        
+        File starFile = new File("Graphics/star.png");
+        FileInputStream inputstream = new FileInputStream(starFile); 
+        Image star = new Image(inputstream);
+        ImageView starView = new ImageView(star);
+        
+        Label leaderboardTitle = new Label("TOP 5 Players with most wins");
+        leaderboardTitle.setStyle("-fx-font: 12px Verdana; -fx-font-weight: bold;");
+        
+        HBox starAndTitle = new HBox();
+        starAndTitle.setStyle("-fx-alignment: center;");
+        starAndTitle.setSpacing(7);
+        starAndTitle.getChildren().addAll(starView, leaderboardTitle);
+        
         
         
         VBox vboxWinners = new VBox();
@@ -410,11 +435,11 @@ public class Main extends Application {
         vboxWinners.setPrefSize(300, 180);
         vboxWinners.setSpacing(10);
         vboxWinners.setPadding(new Insets(30, 30, 30, 30));
-        vboxWinners.getChildren().add(new Label("Players with most wins"));
+        vboxWinners.getChildren().add(starAndTitle);
         
         ArrayList<Player> players = playerDao.findWinners();  
         for(Player player : players){
-            vboxWinners.getChildren().add(new Label(player.getName() + "  " + player.getWins()));
+            vboxWinners.getChildren().add(new Label("  " + player.getWins() + "  " + player.getName()));
         }
         
         
@@ -424,9 +449,10 @@ public class Main extends Application {
         
         
         
+        
         File logoFile = new File("Graphics/logo.png");
-        FileInputStream inputstream = new FileInputStream(logoFile); 
-        Image logo = new Image(inputstream);
+        FileInputStream inputstream2 = new FileInputStream(logoFile); 
+        Image logo = new Image(inputstream2);
         ImageView logoView = new ImageView(logo);
         
         
@@ -443,6 +469,20 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws SQLException, IOException{
         buildAndSetSelectionScene(stage);
+        
+//        File logoFile = new File("Graphics/logo.png");
+//        FileInputStream inputstream = new FileInputStream(logoFile); 
+//        Image logo = new Image(inputstream);
+
+       stage.getIcons().addAll(
+               new Image("file:Graphics/icon16.png"), 
+               new Image("file:Graphics/icon24.png"), 
+               new Image("file:Graphics/icon32.png"), 
+               new Image("file:Graphics/icon48.png"), 
+               new Image("file:Graphics/icon64.png"), 
+               new Image("file:Graphics/icon256.png"));
+       stage.setTitle("Fortress Duel");
+        
         stage.show();
     }
     
