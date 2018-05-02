@@ -35,7 +35,6 @@
 | 23.4  |  6.50  | ^samaa. |
 | 23.4  |  0.18  | Lisätty testejä. |
 | 24.4  |  3.00  | Lisätty alkeellinen scoreboard, pieni refaktorointi, korjattu checkstylen kehoittamia pieniä asioita, release, README.md päivitys, sekvenssikaavio ja työaikakirjanpidon päivitys. |
-
 | 27.4  |  2.00  | Infolaatikko pelikentän alle jossa vuoron indikointi ja linnoitusten terveys ja sen vaatimat palvelut Game-luokkaan + hieman refaktorointia. |
 | 27.4  |  1.00  | Taustakuvan lisääminen pelikenttään. |
 | 27.4  |  1.00  | Toteutettu Vacuum chamber kentän kovat rajat |
