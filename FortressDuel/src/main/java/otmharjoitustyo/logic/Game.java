@@ -74,8 +74,7 @@ public class Game {
         this.ammunitionMaxY = level.getAmmunitionMaxY();
         this.ammunitionMinY = level.getAmmunitionMinY();
         
-        this.gameFieldWithBackground = new BufferedImage(gameField.getWidth(), gameField.getHeight(), BufferedImage.TYPE_INT_RGB);
-        initializeGameFieldWithBackground();
+        this.gameFieldWithBackground = ImageOperations.createNewImageAsCombinationOfFrontImageAndBackground(gameField, background);
         
         this.oldAmmunitionExist = false;
         
@@ -91,12 +90,6 @@ public class Game {
             state = 1;
         }
     }
-    
-    // From normal to image coordinates
-    private int yTransform(int y) {
-        return this.gameField.getHeight() - y;
-    }
-    
     
     public int ammunitionX(double seconds) { // public for testing, otherwise private.
         double positionDueInitialVx = this.initialVx * seconds;
@@ -185,98 +178,12 @@ public class Game {
         
         return calculateYwithDragResult(t, a, g, v, p);
     }
-          
-    
-    // advance päällä: Kasvata keltaista alueta punaisella kaverisääntöjen ja satunnaisuuden perusteella.
-    // pois päältä:    Vaihda punaiset keltaisiksi.
-    private void explosionAdvancer(BufferedImage image, int xMin, int xMax, int yMin, int yMax, 
-                                   int circleX, int circleY, int radius, 
-                                   boolean advance, Color color, Color replace, BufferedImage fillImage) {
-        
-        int yStart = circleY - radius;
-        int xStart = circleX - radius;
-        int yTarget = yStart + 2 * radius;
-        int xTarget = xStart + 2 * radius;
-        
-        // Image boundary checks.
-        if (yStart < 0) {
-            yStart = 0;
-        }
-        if (xStart < 0) {
-            xStart = 0;
-        }
-        if (image.getHeight() <= yTarget) {
-            yTarget = image.getHeight() - 1;
-        }
-        if (image.getWidth() <= xTarget) {
-            xTarget = image.getWidth() - 1;
-        }
-        
-        int y = yStart;
-        int x = xStart;
-        
-        Random random = new Random(explosionSeed);
-        
-        // Loops which go through a rectangle pixel by pixel that will hold the explosion to be drawn.
-        while (y <= yTarget) {
-            while (x <= xTarget) {
-                
-                // Circle expression: (x-x0)2 + (y-y0)2 <= radius2
-                if ((x - circleX) * (x - circleX) + (y - circleY) * (y - circleY) <= radius * radius) {
-                    
-                    if (color != null && replace != null) {
-                        if (image.getRGB(x, yTransform(y)) == color.getRGB()) {
-                            image.setRGB(x, yTransform(y), replace.getRGB()); 
-                        }
-                    } else if (color != null && fillImage != null) {
-                        if (image.getRGB(x, yTransform(y)) == color.getRGB()) {
-                            image.setRGB(x, yTransform(y), fillImage.getRGB(x, yTransform(y))); 
-                        }
-                    } else if (advance) {
-                        if (image.getRGB(x, yTransform(y)) != Color.YELLOW.getRGB()
-                            && 3 <= ImageOperations.countYellowBuddies(image, x, y, xMin, xMax, yMin, yMax) - random.nextInt(3)) {
-                            image.setRGB(x, yTransform(y), Color.RED.getRGB()); 
-                        }
-                    }
-                }
-                
-                ++x;
-            }
-            
-            x = xStart;
-            ++y;
-        }
-        
-    }
     
     private void removeOldAmmunitionIfExistent() {
         if (oldAmmunitionExist) {
             ImageOperations.insertCircle(gameField, oldAmmunitionX, oldAmmunitionY, AMMUNITION_RADIUS, Color.WHITE, null);
             ImageOperations.insertCircle(gameFieldWithBackground, oldAmmunitionX, oldAmmunitionY, AMMUNITION_RADIUS, null, background);
             oldAmmunitionExist = false;
-        }
-    }
-    
-    private void initializeGameFieldWithBackground() {     // REFAKTOROI LUUPPI KOMBO!!!!!!!!!!!!!!!!!!!!???????
-        int yMax = gameField.getHeight();
-        int xMax = gameField.getWidth();
-        
-        int y = 0;
-        int x = 0;
-        while (y < yMax) {
-            while (x < xMax) {
-                
-                if (gameField.getRGB(x, y) == Color.WHITE.getRGB()) {
-                    gameFieldWithBackground.setRGB(x, y, background.getRGB(x, y));
-                } else {
-                    gameFieldWithBackground.setRGB(x, y, gameField.getRGB(x, y));
-                }
-                
-                ++x;
-            }
-            
-            x = 0;
-            ++y;
         }
     }
     
@@ -306,7 +213,7 @@ public class Game {
         // Trace for Vacuum chamber level.
         if (level.isVacuumPossible()) {
             if (0 < ammunitionX && ammunitionX < background.getWidth() && 0 < ammunitionY && ammunitionY < background.getHeight()) {
-                background.setRGB(ammunitionX, yTransform(ammunitionY), Color.BLACK.getRGB());
+                background.setRGB(ammunitionX, ImageOperations.yTransform(background, ammunitionY), Color.BLACK.getRGB());
             }
         }
 
@@ -346,17 +253,17 @@ public class Game {
         // MOLEMPIIN!
 
         for (int i = 0; i < 3; i++) {
-            explosionAdvancer(gameField, 0, gameField.getWidth(), 0, gameField.getHeight(), 
+            ImageOperations.explosionAdvancer(gameField, explosionSeed, 
                               explosionX, explosionY, EXPLOSION_RADIUS, 
                               false, Color.RED, Color.YELLOW, null);
-            explosionAdvancer(gameFieldWithBackground, 0, gameFieldWithBackground.getWidth(), 0, gameFieldWithBackground.getHeight(), 
+            ImageOperations.explosionAdvancer(gameFieldWithBackground, explosionSeed, 
                               explosionX, explosionY, EXPLOSION_RADIUS, 
                               false, Color.RED, Color.YELLOW, null);
 
-            explosionAdvancer(gameField, 0, gameField.getWidth(), 0, gameField.getHeight(), 
+            ImageOperations.explosionAdvancer(gameField, explosionSeed, 
                               explosionX, explosionY, EXPLOSION_RADIUS, 
                               true, null, null, null);
-            explosionAdvancer(gameFieldWithBackground, 0, gameFieldWithBackground.getWidth(), 0, gameFieldWithBackground.getHeight(), 
+            ImageOperations.explosionAdvancer(gameFieldWithBackground, explosionSeed, 
                               explosionX, explosionY, EXPLOSION_RADIUS, 
                               true, null, null, null);                    
         }        
@@ -367,18 +274,18 @@ public class Game {
         // ja g keltaset ja punaset täytetään täytetään valkosella.
 
         // Eka punaset keltasiks niin tarvii korvata vaan punaset.
-        explosionAdvancer(gameField, 0, gameField.getWidth(), 0, gameField.getHeight(), 
+        ImageOperations.explosionAdvancer(gameField, explosionSeed, 
                           explosionX, explosionY, EXPLOSION_RADIUS, 
                           false, Color.RED, Color.YELLOW, null);
-        explosionAdvancer(gameFieldWithBackground, 0, gameFieldWithBackground.getWidth(), 0, gameFieldWithBackground.getHeight(), 
+        ImageOperations.explosionAdvancer(gameFieldWithBackground, explosionSeed, 
                           explosionX, explosionY, EXPLOSION_RADIUS, 
                           false, Color.RED, Color.YELLOW, null);
 
 
-        explosionAdvancer(gameField, 0, gameField.getWidth(), 0, gameField.getHeight(), 
+        ImageOperations.explosionAdvancer(gameField, explosionSeed, 
                           explosionX, explosionY, EXPLOSION_RADIUS, 
                           false, Color.YELLOW, Color.WHITE, null);
-        explosionAdvancer(gameFieldWithBackground, 0, gameFieldWithBackground.getWidth(), 0, gameFieldWithBackground.getHeight(), 
+        ImageOperations.explosionAdvancer(gameFieldWithBackground, explosionSeed, 
                           explosionX, explosionY, EXPLOSION_RADIUS, 
                           false, Color.YELLOW, null, background);
 
@@ -427,36 +334,14 @@ public class Game {
         return state;
     }
     
-    private int countNonWhitePixelsFromDefinedImageArea(BufferedImage image, int minX, int maxX, int minY, int maxY) {
-        int nonWhitePixels = 0;
-        
-        int yIndex = minY;
-        int xIndex = minX;
-        while (yIndex < maxY) {
-            while (xIndex < maxX) {
-                
-                if (image.getRGB(xIndex, yTransform(yIndex)) != Color.WHITE.getRGB()) {
-                    ++nonWhitePixels;
-                }
-                
-                ++xIndex;
-            }
-            
-            xIndex = minX;
-            ++yIndex;
-        }
-        
-        return nonWhitePixels;
-    }
-    
     public int leftFortressPixels() {
-        return countNonWhitePixelsFromDefinedImageArea(gameField, 
+        return ImageOperations.countNonWhitePixelsFromDefinedImageArea(gameField, 
                 level.getLeftFortressMinX(), level.getLeftFortressMaxX(), 
                 level.getLeftFortressMinY(), level.getLeftFortressMaxY());
     }
     
     public int rightFortressPixels() {
-        return countNonWhitePixelsFromDefinedImageArea(gameField, 
+        return ImageOperations.countNonWhitePixelsFromDefinedImageArea(gameField, 
                 level.getRightFortressMinX(), level.getRightFortressMaxX(), 
                 level.getRightFortressMinY(), level.getRightFortressMaxY());
     }
@@ -469,19 +354,19 @@ public class Game {
         return rightFortressPixels() / (1.0 * this.rightFortressPixelsStart);
     }
     
-    public String checkWinner() {   // EI ENÄÄN TARPEELLINEN.
-        int leftFortressPixels = leftFortressPixels();
-        int rightFortressPixels = rightFortressPixels();
-        
-        if (leftFortressPixels > 0 && rightFortressPixels > 0) {
-            return null;
-        } else if (leftFortressPixels == 0 && rightFortressPixels == 0) {
-            return "TIE!";
-        } else if (leftFortressPixels == 0) {
-            return "Right player won!";
-        } else {
-            return "Left player won!";
-        }
-    }
+//    public String checkWinner() {   // EI ENÄÄN TARPEELLINEN.
+//        int leftFortressPixels = leftFortressPixels();
+//        int rightFortressPixels = rightFortressPixels();
+//        
+//        if (leftFortressPixels > 0 && rightFortressPixels > 0) {
+//            return null;
+//        } else if (leftFortressPixels == 0 && rightFortressPixels == 0) {
+//            return "TIE!";
+//        } else if (leftFortressPixels == 0) {
+//            return "Right player won!";
+//        } else {
+//            return "Left player won!";
+//        }
+//    }
     
 }
