@@ -16,16 +16,11 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 
-import javafx.scene.layout.BorderPane;
-
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 
 import javafx.embed.swing.SwingFXUtils;
 
 import javafx.scene.paint.Color;
-
-import java.sql.SQLException;
 
 // Game scene
 import javafx.scene.control.ProgressBar;
@@ -42,20 +37,37 @@ import javafx.scene.layout.HBox;
 import java.util.ArrayList;
 import javafx.scene.image.ImageView;
 
-import java.io.File;
-import javax.imageio.ImageIO;
-import java.io.FileInputStream;
-
 public class Main extends Application {
     
     LevelDao levelDao;
     PlayerDao playerDao;
     
     @Override
-    public void init() throws SQLException, IOException {
+    public void init() {
         Database database = new Database("jdbc:sqlite:Gamedata.db");
         levelDao = new LevelDao(database);
         playerDao = new PlayerDao(database);
+    }
+    
+    private void buildAndSetExceptionScene(Stage stage, String message){
+        VBox vbox = new VBox();
+        vbox.setPrefWidth(400);  // min aiemman ikkunan tiedoista????
+        vbox.setPrefHeight(400);
+        vbox.setSpacing(40);
+        vbox.setPadding(new Insets(30, 30, 30, 30));
+        
+        Label messageLabel = new Label(message);
+        messageLabel.setTextFill(Color.RED);
+        
+        Button redirectButton = new Button("Exit to main menu");
+        redirectButton.setOnAction((event) -> {
+            buildAndSetSelectionScene(stage);
+        });
+        
+        vbox.getChildren().addAll(messageLabel, redirectButton);
+        
+        Scene exceptionScene = new Scene(vbox);
+        stage.setScene(exceptionScene);
     }
 
     private void buildAndSetGameScene(Stage stage, Game game, Level level, Player leftPlayer, Player rightPlayer){
@@ -115,13 +127,7 @@ public class Main extends Application {
         int[] rightPrevious = new int[]{0,0,0};
         
         Button exitButton = new Button("Exit game");
-        exitButton.setOnAction((event) -> {
-            try{
-                buildAndSetSelectionScene(stage);
-            } catch(Exception e){
-                //System.out.println("ERROR2");// ERROR?!?!?!?!?!?????????????????????
-            }
-        });
+        // Exit button action is after the simulation.
         
         VBox centerBox = new VBox();
         centerBox.setPrefSize((int)(level.getGameField().getWidth()*0.333), 70);
@@ -203,14 +209,12 @@ public class Main extends Application {
                                 playerDao.update(leftPlayer);
                                 playerDao.update(rightPlayer);
                             } catch(Exception e){
-                                //System.out.println("ERROR1");// ERROR?!?!?!?!?!?????????????????????
+                                this.stop();
+                                buildAndSetExceptionScene(stage, "A problem occured while saving the results of the game.");
                             }
                             
-                            try{
-                                buildAndSetSelectionScene(stage);
-                            } catch(Exception e){
-                                //System.out.println("ERROR2");// ERROR?!?!?!?!?!?????????????????????
-                            }
+                            this.stop();
+                            buildAndSetSelectionScene(stage);
                         }
                     }
                     
@@ -227,6 +231,12 @@ public class Main extends Application {
                 
             }
         };
+        
+        // This is here so it can stop the simulation.
+        exitButton.setOnAction((event) -> {
+            simulation.stop();
+            buildAndSetSelectionScene(stage);
+        });
         
         // Drawing of the cannon aiming vectors.         
         canvas.setOnMouseMoved((event) -> {
@@ -331,7 +341,9 @@ public class Main extends Application {
             try{
                 level = levelDao.findOne(levelName);
             } catch(Exception e){
-                //System.out.println("Error while loading the level!");  // MUUTA GRAAFISEKS?!?!?!?!?!
+                // Exception redirection back to the same scene, 
+                // because possibly exception causing operations are executed only after a button is pushed.
+                buildAndSetNameEntryScene(stage, levelName, "A problem occured while loading the level.");
             }
             Game game = new Game(level);
             
@@ -358,7 +370,10 @@ public class Main extends Application {
                     playerDao.add(rightPlayer);
                 }
                 
-            } catch(Exception e){   
+            } catch(Exception e){
+                // Exception redirection back to the same scene, 
+                // because possibly exception causing operations are executed only after a button is pushed.
+                buildAndSetNameEntryScene(stage, levelName, "A problem occured while processing the players' names");
             }
             
             buildAndSetGameScene(stage, game, level, leftPlayer, rightPlayer);
@@ -383,14 +398,24 @@ public class Main extends Application {
         stage.setScene(nameEntryScene);
     }
     
-    private void buildAndSetSelectionScene(Stage stage) throws SQLException, IOException{
+    private void buildAndSetSelectionScene(Stage stage) {
         
         VBox vboxLevels = new VBox();
 //        vboxLevels.setPrefSize(300, 180);
 //        vboxLevels.setSpacing(10);
 //        vboxLevels.setPadding(new Insets(30, 30, 30, 30));
         
-        ArrayList<Level> levels = levelDao.listAll();
+
+        ArrayList<Level> levels = null;
+        
+        try{
+            levels = levelDao.listAll();
+        } catch(Exception e){
+             // Exception redirection to a dedicated exception scene, 
+             // in order to avoid a possible unending exception redirection loop.
+             buildAndSetExceptionScene(stage, "A problem occured while listing the levels of the game.");
+        }
+        
         for(Level level : levels){
             
             Image thumbnail = SwingFXUtils.toFXImage(level.getThumbnail(), null);
@@ -414,12 +439,7 @@ public class Main extends Application {
         }
         
         
-        
-        File starFile = new File("Graphics/star.png");
-        FileInputStream inputstream = new FileInputStream(starFile); 
-        Image star = new Image(inputstream);
-        ImageView starView = new ImageView(star);
-        
+        ImageView starView = new ImageView(new Image("file:Graphics/star.png"));
         Label leaderboardTitle = new Label("TOP 5 Players with most wins");
         leaderboardTitle.setStyle("-fx-font: 12px Verdana; -fx-font-weight: bold;");
         
@@ -437,7 +457,17 @@ public class Main extends Application {
         vboxWinners.setPadding(new Insets(30, 30, 30, 30));
         vboxWinners.getChildren().add(starAndTitle);
         
-        ArrayList<Player> players = playerDao.findWinners();  
+        
+        ArrayList<Player> players = null;
+        
+        try{
+            players = playerDao.findWinners();
+        } catch(Exception e){
+             // Exception redirection to a dedicated exception scene, 
+             // in order to avoid a possible unending exception redirection loop.
+             buildAndSetExceptionScene(stage, "A problem occured while listing the TOP 5 players.");
+        }
+        
         for(Player player : players){
             vboxWinners.getChildren().add(new Label("  " + player.getWins() + "  " + player.getName()));
         }
@@ -448,15 +478,7 @@ public class Main extends Application {
         hbox.getChildren().add(vboxWinners);
         
         
-        
-        
-        File logoFile = new File("Graphics/logo.png"); 
-        FileInputStream inputstream2 = new FileInputStream(logoFile); 
-        Image logo = new Image(inputstream2);
-        ImageView logoView = new ImageView(logo);
-        
-        
-        
+        ImageView logoView = new ImageView(new Image("file:Graphics/logo.png"));
         VBox mainBox = new VBox();
         mainBox.setStyle("-fx-background-color: #74ecf2; -fx-alignment: center;");
         mainBox.getChildren().add(logoView);
@@ -467,21 +489,18 @@ public class Main extends Application {
     }
     
     @Override
-    public void start(Stage stage) throws SQLException, IOException{
+    public void start(Stage stage) {
+        
         buildAndSetSelectionScene(stage);
         
-//        File logoFile = new File("Graphics/logo.png");
-//        FileInputStream inputstream = new FileInputStream(logoFile); 
-//        Image logo = new Image(inputstream);
-
-       stage.getIcons().addAll(
-               new Image("file:Graphics/icon16.png"), 
-               new Image("file:Graphics/icon24.png"), 
-               new Image("file:Graphics/icon32.png"), 
-               new Image("file:Graphics/icon48.png"), 
-               new Image("file:Graphics/icon64.png"), 
-               new Image("file:Graphics/icon256.png"));
-       stage.setTitle("Fortress Duel");
+        stage.getIcons().addAll(
+                new Image("file:Graphics/icon16.png"), 
+                new Image("file:Graphics/icon24.png"), 
+                new Image("file:Graphics/icon32.png"), 
+                new Image("file:Graphics/icon48.png"), 
+                new Image("file:Graphics/icon64.png"), 
+                new Image("file:Graphics/icon256.png"));
+        stage.setTitle("Fortress Duel");
         
         stage.show();
     }
