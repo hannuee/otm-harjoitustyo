@@ -3,6 +3,8 @@
  */
 package otmharjoitustyo.GUI;
 
+import otmharjoitustyo.logic.GameService;
+
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -13,7 +15,7 @@ import javafx.stage.Stage;
 
 public class ExceptionScene {
     
-    public static void buildAndSet(Main main, String message){
+    public ExceptionScene(Main main, GameService gameService, String message){
         VBox vbox = new VBox();
         vbox.setPrefWidth(400);  // min aiemman ikkunan tiedoista????
         vbox.setPrefHeight(400);
@@ -25,13 +27,13 @@ public class ExceptionScene {
         
         Button redirectButton = new Button("Exit to main menu");
         redirectButton.setOnAction((event) -> {
-            SelectionScene.buildAndSet(main);
+            new SelectionScene(main, gameService);
         });
         
         vbox.getChildren().addAll(messageLabel, redirectButton);
         
         Scene exceptionScene = new Scene(vbox);
-        main.getStage().setScene(exceptionScene);
+        main.setNewSceneOnStage(exceptionScene);
     }
     
 }

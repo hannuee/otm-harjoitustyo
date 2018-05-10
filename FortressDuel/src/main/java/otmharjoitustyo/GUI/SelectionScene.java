@@ -5,6 +5,7 @@ package otmharjoitustyo.GUI;
 
 import otmharjoitustyo.domain.Level;
 import otmharjoitustyo.domain.Player;
+import otmharjoitustyo.logic.GameService;
 
 import java.util.ArrayList;
 import javafx.embed.swing.SwingFXUtils;
@@ -19,7 +20,7 @@ import javafx.stage.Stage;
 
 public class SelectionScene {
     
-    public static void buildAndSet(Main main) {
+    public SelectionScene(Main main, GameService gameService) {
         
         VBox vboxLevels = new VBox();
 //        vboxLevels.setPrefSize(300, 180);
@@ -30,11 +31,11 @@ public class SelectionScene {
         ArrayList<Level> levels = null;
         
         try{
-            levels = main.getLevelDao().listAll();
+            levels = gameService.listAllLevels();
         } catch(Exception e){
              // Exception redirection to a dedicated exception scene, 
              // in order to avoid a possible unending exception redirection loop.
-             ExceptionScene.buildAndSet(main, "A problem occured while listing the levels of the game.");
+             new ExceptionScene(main, gameService, "A problem occured while listing the levels of the game.");
              return;
         }
         
@@ -54,7 +55,7 @@ public class SelectionScene {
             });
             
             thumbnailView.setOnMouseClicked((event) -> {
-                NameEntryScene.buildAndSet(main, level.getName(), null);
+                new NameEntryScene(main, gameService, level.getName(), null);
             });
             
             vboxLevels.getChildren().add(thumbnailView);
@@ -83,11 +84,11 @@ public class SelectionScene {
         ArrayList<Player> players = null;
         
         try{
-            players = main.getPlayerDao().findWinners();
+            players = gameService.listTOP5winners();
         } catch(Exception e){
              // Exception redirection to a dedicated exception scene, 
              // in order to avoid a possible unending exception redirection loop.
-             ExceptionScene.buildAndSet(main, "A problem occured while listing the TOP 5 players.");
+             new ExceptionScene(main, gameService, "A problem occured while listing the TOP 5 players.");
              return;
         }
         
@@ -108,7 +109,7 @@ public class SelectionScene {
         mainBox.getChildren().add(hbox);
         
         Scene selectionScene = new Scene(mainBox);
-        main.getStage().setScene(selectionScene);
+        main.setNewSceneOnStage(selectionScene);
     }
     
 }

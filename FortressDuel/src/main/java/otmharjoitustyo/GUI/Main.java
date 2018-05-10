@@ -3,23 +3,25 @@
  */
 package otmharjoitustyo.GUI;
 
+import otmharjoitustyo.logic.GameService;
 import otmharjoitustyo.database.*;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
 import javafx.scene.image.Image;
+import javafx.scene.Scene;
 
 public class Main extends Application {
     
-    LevelDao levelDao;
-    PlayerDao playerDao;
-    Stage stage;
+    private GameService gameService;
+    private Stage stage;
     
     @Override
     public void init() {
         Database database = new Database("jdbc:sqlite:Gamedata.db");
-        this.levelDao = new LevelDao(database);
-        this.playerDao = new PlayerDao(database);
+        LevelDao levelDao = new LevelDao(database);
+        PlayerDao playerDao = new PlayerDao(database);
+        this.gameService = new GameService(levelDao, playerDao);
     }
     
     @Override
@@ -35,7 +37,7 @@ public class Main extends Application {
                 new Image("file:Graphics/icon256.png"));
         stage.setTitle("Fortress Duel");
         
-        SelectionScene.buildAndSet(this);
+        new SelectionScene(this, this.gameService);
         
         stage.show();
     }
@@ -44,16 +46,8 @@ public class Main extends Application {
         launch(Main.class);
     }
     
-    public LevelDao getLevelDao(){
-        return this.levelDao;
-    }
-    
-    public PlayerDao getPlayerDao(){
-        return this.playerDao;
-    }
-    
-    public Stage getStage(){
-        return this.stage;
+    public void setNewSceneOnStage(Scene newScene){
+        this.stage.setScene(newScene);
     }
     
 }
