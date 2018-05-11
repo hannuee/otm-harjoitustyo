@@ -47,7 +47,7 @@ public class Main extends Application {
     }
     
     public void setNewSceneOnStage(Scene newScene){
-        this.stage.setScene(newScene);
+        stage.setScene(newScene);
     }
     
 }

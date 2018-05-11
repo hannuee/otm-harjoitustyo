@@ -3,9 +3,6 @@
  */
 package otmharjoitustyo.GUI;
 
-import otmharjoitustyo.domain.Level;
-import otmharjoitustyo.domain.Player;
-import otmharjoitustyo.logic.Game;
 import otmharjoitustyo.logic.GameService;
 import otmharjoitustyo.GUI.elements.GameBar;
 
@@ -23,7 +20,6 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.stage.Stage;
 
 public class GameScene {
     

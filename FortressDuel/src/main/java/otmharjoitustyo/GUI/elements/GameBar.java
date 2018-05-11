@@ -18,7 +18,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 public class GameBar {
-    
+    private Main main;
     private GameService gameService;
     private AnimationTimer simulation;
     
@@ -36,14 +36,22 @@ public class GameBar {
     private Label amountOfAimRight;  
     
     private Button vacuumControl;
-    private Button fireWithPrevious;
     
     HBox gameBarBox;
     
     public GameBar(Main main, GameService gameService){
+        this.main = main;
         this.gameService = gameService;
         
-        // Left player
+        VBox leftBox = initializeLeftPlayerInformationBox();
+        VBox centerBox = initializeCenterBox();
+        VBox rightBox = initializeRightPlayerInformationBox();
+        
+        gameBarBox = new HBox();
+        gameBarBox.getChildren().addAll(leftBox, centerBox, rightBox);
+    }
+    
+    private VBox initializeLeftPlayerInformationBox() {
         leftLabel = new Label(gameService.getLeftPlayerName());
         leftBar = new ProgressBar(gameService.getLeftFortressPercentage());
         angleOfAimLeft = new Label(AIM_ANGLE_TITLE);
@@ -55,8 +63,10 @@ public class GameBar {
         leftBox.setPadding(new Insets(30, 30, 30, 30));
         leftBox.getChildren().addAll(leftLabel, leftBar, angleOfAimLeft, amountOfAimLeft);
         
-        
-        // Right player
+        return leftBox;
+    }
+    
+    private VBox initializeRightPlayerInformationBox() {
         rightLabel = new Label(gameService.getRightPlayerName());
         rightBar = new ProgressBar(gameService.getRightFortressPercentage());
         angleOfAimRight = new Label(AIM_ANGLE_TITLE);
@@ -67,9 +77,11 @@ public class GameBar {
         rightBox.setStyle("-fx-alignment: center;");
         rightBox.setPadding(new Insets(30, 30, 30, 30));
         rightBox.getChildren().addAll(rightLabel, rightBar, angleOfAimRight, amountOfAimRight);
-        
-        
-        // Center buttons
+
+        return rightBox;
+    }
+    
+    private void initializeVacuumControlButton() {
         vacuumControl = new Button("Suck all the air out!");
         if (gameService.isVacuumPossibleInThisLevel()) {
             vacuumControl.setOnAction((event) -> {
@@ -79,9 +91,11 @@ public class GameBar {
                     vacuumControl.setText("Suck all the air out!");
                 }
             });
-        }
-        
-        fireWithPrevious = new Button("Fire cannon with previous settings");
+        }        
+    }
+    
+    private Button initializeFireWithPreviousButton() {
+        Button fireWithPrevious = new Button("Fire cannon with previous settings");
         if (gameService.isVacuumPossibleInThisLevel()) {
             fireWithPrevious.setOnAction((event) -> {
                 if (gameService.fireCannonWithPreviousSettingsIfPossible()) {
@@ -89,13 +103,24 @@ public class GameBar {
                     simulation.start();
                 }
             });
-        }
-        
+        }   
+        return fireWithPrevious;
+    }
+    
+    private Button initializeExitButton() {
         Button exitButton = new Button("Exit game");
         exitButton.setOnAction((event) -> {
             simulation.stop();
             new SelectionScene(main, gameService);
         });
+        return exitButton;
+    }
+    
+    private VBox initializeCenterBox() {
+        // Center buttons
+        initializeVacuumControlButton();
+        Button fireWithPrevious = initializeFireWithPreviousButton();
+        Button exitButton = initializeExitButton();
         
         VBox centerBox = new VBox();
         centerBox.setPrefSize((int)(gameService.getGameFieldWidth()*0.333), 70);
@@ -107,9 +132,7 @@ public class GameBar {
         }
         centerBox.getChildren().add(exitButton);
         
-        
-        gameBarBox = new HBox();
-        gameBarBox.getChildren().addAll(leftBox, centerBox, rightBox);
+        return centerBox;
     }
     
     public void setAnimationTimer(AnimationTimer simulation){
@@ -119,6 +142,7 @@ public class GameBar {
     public HBox getGameBarElement(){
         return gameBarBox;
     }
+    
     
     public void indicateNoTurn(){
         leftLabel.setTextFill(Color.BLACK);

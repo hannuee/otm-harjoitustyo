@@ -104,6 +104,20 @@ public class Game {
         return (int) positionDueInitialVx + positionDueCannonPosition;
     }
     
+    public int ammunitionY(double seconds) {  // public for testing, otherwise private.
+        double positionDueGravity = (-9.81 / 2.0) * Math.pow(seconds, 2);
+        double positionDueInitialVy = this.initialVy * seconds;
+        
+        int positionDueCannonPosition;
+        if (state == 2) {
+            positionDueCannonPosition = this.leftCannonY;
+        } else {
+            positionDueCannonPosition = this.rightCannonY;
+        }
+        
+        return (int) (positionDueGravity + positionDueInitialVy) + positionDueCannonPosition;
+    }
+    
     public int ammunitionXwithDrag(double t) {  // public for testing, otherwise private.
         final double a = 0.00019242255;
         final double v = Math.abs(this.initialVx);
@@ -131,21 +145,6 @@ public class Game {
             return (int) ((up1 - up2 + up3) / a);
         }
     }
-    
-    public int ammunitionY(double seconds) {  // public for testing, otherwise private.
-        double positionDueGravity = (-9.81 / 2.0) * Math.pow(seconds, 2);
-        double positionDueInitialVy = this.initialVy * seconds;
-        
-        int positionDueCannonPosition;
-        if (state == 2) {
-            positionDueCannonPosition = this.leftCannonY;
-        } else {
-            positionDueCannonPosition = this.rightCannonY;
-        }
-        
-        return (int) (positionDueGravity + positionDueInitialVy) + positionDueCannonPosition;
-    }
-    
     
     public int calculateYwithDragResult(double t, double a, double g, double v, int p) {
         double up1;

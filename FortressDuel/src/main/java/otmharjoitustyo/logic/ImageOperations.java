@@ -14,58 +14,63 @@ public class ImageOperations {
         return image.getHeight() - y;
     }
     
-    public static boolean insertCircle(BufferedImage image, int circleX, int circleY, int radius, 
-                                                          Color color, BufferedImage fillImage) {
-        boolean nonWhitePixelsOverwritten = false;
+    public static void imageCircularAreaPixelLoops(int xStart, int yStart, int xTarget, int yTarget, 
+                                            int circleX, int circleY, int radius, PixelHandler pixelHandler){
+        int x = xStart;
+        int y = yStart;
         
+        // Loops which go through a rectangle pixel by pixel that will hold the circle.
+        while (y <= yTarget) {
+            while (x <= xTarget) {
+                // Circle expression: (x-x0)2 + (y-y0)2 <= radius2
+                if ((x - circleX) * (x - circleX) + (y - circleY) * (y - circleY) <= radius * radius) {
+                    pixelHandler.handle(x, y);
+                }
+                ++x;
+            }
+            x = xStart; 
+            ++y;
+        }        
+    }
+    
+    
+    public static void imageCircularAreaHandler(BufferedImage image, int circleX, int circleY, int radius, PixelHandler pixelHandler){
+        // Definition of a square area that holds the circle area.
         int yStart = circleY - radius;
         int xStart = circleX - radius;
         int yTarget = yStart + 2 * radius;
         int xTarget = xStart + 2 * radius;
         
         // Image boundary checks.
-        if (yStart < 0) {
-            yStart = 0;
-        }
-        if (xStart < 0) {
-            xStart = 0;
-        }
-        if (image.getHeight() <= yTarget) {
-            yTarget = image.getHeight() - 1;
-        }
-        if (image.getWidth() <= xTarget) {
-            xTarget = image.getWidth() - 1;
-        }
+        if (yStart < 0) yStart = 0;
+        if (xStart < 0) xStart = 0;
+        if (image.getHeight() <= yTarget) yTarget = image.getHeight() - 1;
+        if (image.getWidth() <= xTarget) xTarget = image.getWidth() - 1;
         
-        int y = yStart;
-        int x = xStart;
         
-        // Loops which go through a rectangle pixel by pixel that will hold the circle to be drawn.
-        while (y <= yTarget) {
-            while (x <= xTarget) {
-                
-                // Circle expression: (x-x0)2 + (y-y0)2 <= radius2
-                if ((x - circleX) * (x - circleX) + (y - circleY) * (y - circleY) <= radius * radius) {
-                    
+        imageCircularAreaPixelLoops(xStart, yStart, xTarget, yTarget, 
+                                    circleX, circleY, radius, pixelHandler);
+    }
+    
+    // image handler,  pixel handler
+    public static boolean insertCircle(BufferedImage image, int circleX, int circleY, int radius, 
+                                                          Color color, BufferedImage fillImage) {
+        int[] nonWhitePixelsOverwritten = {0};
+        
+        imageCircularAreaHandler(image, circleX, circleY, radius, 
+                (x, y)->{
                     if (image.getRGB(x, yTransform(image, y)) != Color.WHITE.getRGB()) {
-                        nonWhitePixelsOverwritten = true;
+                        nonWhitePixelsOverwritten[0] = 1;
                     }
                     
                     if (color != null) {  // Fill circle with given color.
                         image.setRGB(x, yTransform(image, y), color.getRGB());
                     } else {            // Fill circle with given image.
                         image.setRGB(x, yTransform(image, y), fillImage.getRGB(x, yTransform(image, y)));
-                    }
-                }
-                
-                ++x;
-            }
-            
-            x = xStart;
-            ++y;
-        }
+                    }                
+                });
         
-        return nonWhitePixelsOverwritten;
+        return nonWhitePixelsOverwritten[0] == 1;
     }
     
     // advance päällä: Kasvata keltaista alueta punaisella kaverisääntöjen ja satunnaisuuden perusteella.
@@ -73,38 +78,10 @@ public class ImageOperations {
     public static void explosionAdvancer(BufferedImage image, int explosionSeed, 
                                    int circleX, int circleY, int radius, 
                                    boolean advance, Color color, Color replace, BufferedImage fillImage) {
-        
-        int yStart = circleY - radius;
-        int xStart = circleX - radius;
-        int yTarget = yStart + 2 * radius;
-        int xTarget = xStart + 2 * radius;
-        
-        // Image boundary checks.
-        if (yStart < 0) {
-            yStart = 0;
-        }
-        if (xStart < 0) {
-            xStart = 0;
-        }
-        if (image.getHeight() <= yTarget) {
-            yTarget = image.getHeight() - 1;
-        }
-        if (image.getWidth() <= xTarget) {
-            xTarget = image.getWidth() - 1;
-        }
-        
-        int y = yStart;
-        int x = xStart;
-        
         Random random = new Random(explosionSeed);
         
-        // Loops which go through a rectangle pixel by pixel that will hold the explosion to be drawn.
-        while (y <= yTarget) {
-            while (x <= xTarget) {
-                
-                // Circle expression: (x-x0)2 + (y-y0)2 <= radius2
-                if ((x - circleX) * (x - circleX) + (y - circleY) * (y - circleY) <= radius * radius) {
-                    
+        imageCircularAreaHandler(image, circleX, circleY, radius, 
+                (x, y)->{
                     if (color != null && replace != null) {
                         if (image.getRGB(x, yTransform(image, y)) == color.getRGB()) {
                             image.setRGB(x, yTransform(image, y), replace.getRGB()); 
@@ -119,24 +96,12 @@ public class ImageOperations {
                             image.setRGB(x, yTransform(image, y), Color.RED.getRGB()); 
                         }
                     }
-                }
-                
-                ++x;
-            }
-            
-            x = xStart;
-            ++y;
-        }
-        
+                });
     }
     
-    public static int countYellowBuddies(BufferedImage image, int x, int y) {
+    public static int jee(BufferedImage image, int x, int y, 
+                          boolean upOK, boolean rightOK, boolean downOK, boolean leftOK) {
         int count = 0;
-        
-        boolean upOK = y + 1 < image.getHeight();
-        boolean rightOK = x + 1 < image.getWidth();
-        boolean downOK = 0 <= y - 1;
-        boolean leftOK = 0 <= x - 1;
         
         int color;
         if (upOK) {
@@ -189,6 +154,17 @@ public class ImageOperations {
         }
         
         return count;
+    }
+    
+    public static int countYellowBuddies(BufferedImage image, int x, int y) {
+        // Image boundary checks.
+        boolean upOK = y + 1 < image.getHeight();
+        boolean rightOK = x + 1 < image.getWidth();
+        boolean downOK = 0 <= y - 1;
+        boolean leftOK = 0 <= x - 1;
+        
+        return jee(image, x, y, 
+                   upOK, rightOK, downOK, leftOK);
     }
     
     public static BufferedImage createNewImageAsCombinationOfFrontImageAndBackground(BufferedImage frontImage, BufferedImage background) {

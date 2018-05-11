@@ -3,9 +3,6 @@
  */
 package otmharjoitustyo.GUI;
 
-import otmharjoitustyo.domain.Level;
-import otmharjoitustyo.domain.Player;
-import otmharjoitustyo.logic.Game;
 import otmharjoitustyo.logic.GameService;
 
 import javafx.geometry.Insets;
@@ -14,7 +11,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 
 public class NameEntryScene {
     

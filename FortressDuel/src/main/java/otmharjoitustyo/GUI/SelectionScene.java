@@ -3,9 +3,9 @@
  */
 package otmharjoitustyo.GUI;
 
+import otmharjoitustyo.logic.GameService;
 import otmharjoitustyo.domain.Level;
 import otmharjoitustyo.domain.Player;
-import otmharjoitustyo.logic.GameService;
 
 import java.util.ArrayList;
 import javafx.embed.swing.SwingFXUtils;
@@ -16,7 +16,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 
 public class SelectionScene {
     
