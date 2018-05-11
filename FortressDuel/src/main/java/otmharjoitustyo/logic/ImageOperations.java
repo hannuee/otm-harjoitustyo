@@ -99,121 +99,64 @@ public class ImageOperations {
                 });
     }
     
-    public static int jee(BufferedImage image, int x, int y, 
-                          boolean upOK, boolean rightOK, boolean downOK, boolean leftOK) {
+    public static int countYellowBuddies(BufferedImage image, int x, int y) {
+        int[] clockwiseX = {0, 1, 0, 0,-1,-1, 0, 0};
+        int[] clockwiseY = {1, 0,-1,-1, 0, 0, 1, 1};
+        
         int count = 0;
         
-        int color;
-        if (upOK) {
-            color = image.getRGB(x, yTransform(image, y + 1));
-            if (color == Color.YELLOW.getRGB()) {
-                ++count;
-            }
+        int i = 0;
+        while(i < clockwiseX.length){
+            x += clockwiseX[i];
+            y += clockwiseY[i];
+            if(0 <= x && x < image.getWidth() && 0 <= y && y < image.getHeight() && image.getRGB(x, yTransform(image, y)) == Color.YELLOW.getRGB()) ++count;
+            ++i;
         }
-        if (upOK && rightOK) {
-            color = image.getRGB(x + 1, yTransform(image, y + 1));
-            if (color == Color.YELLOW.getRGB()) {
-                ++count;
-            }
-        }
-        if (rightOK) {
-            color = image.getRGB(x + 1, yTransform(image, y));
-            if (color == Color.YELLOW.getRGB()) {
-                ++count;
-            }
-        }
-        if (downOK && rightOK) {
-            color = image.getRGB(x + 1, yTransform(image, y - 1));
-            if (color == Color.YELLOW.getRGB()) {
-                ++count;
-            }
-        }
-        if (downOK) {
-            color = image.getRGB(x, yTransform(image, y - 1));
-            if (color == Color.YELLOW.getRGB()) {
-                ++count;
-            }
-        }
-        if (downOK && leftOK) {
-            color = image.getRGB(x - 1, yTransform(image, y - 1));
-            if (color == Color.YELLOW.getRGB()) {
-                ++count;
-            }
-        }
-        if (leftOK) {
-            color = image.getRGB(x - 1, yTransform(image, y));
-            if (color == Color.YELLOW.getRGB()) {
-                ++count;
-            }
-        }
-        if (upOK && leftOK) {
-            color = image.getRGB(x - 1, yTransform(image, y + 1));
-            if (color == Color.YELLOW.getRGB()) {
-                ++count;
-            }
-        }
-        
         return count;
     }
     
-    public static int countYellowBuddies(BufferedImage image, int x, int y) {
-        // Image boundary checks.
-        boolean upOK = y + 1 < image.getHeight();
-        boolean rightOK = x + 1 < image.getWidth();
-        boolean downOK = 0 <= y - 1;
-        boolean leftOK = 0 <= x - 1;
+    public static void imageSquareAreaPixelLooper(int xStart, int yStart, int xTarget, int yTarget, 
+                                             PixelHandler pixelHandler) {
+        int x = xStart;
+        int y = yStart;
         
-        return jee(image, x, y, 
-                   upOK, rightOK, downOK, leftOK);
+        // Loops which go through a rectangle pixel by pixel.
+        while (y <= yTarget) {
+            while (x <= xTarget) {
+                pixelHandler.handle(x, y);
+                ++x;
+            }
+            x = xStart; 
+            ++y;
+        }             
     }
     
-    public static BufferedImage createNewImageAsCombinationOfFrontImageAndBackground(BufferedImage frontImage, BufferedImage background) {
+    public static BufferedImage newImageAsCombinationOfFrontAndBackground(BufferedImage frontImage, BufferedImage background) {
         BufferedImage combined = new BufferedImage(frontImage.getWidth(), frontImage.getHeight(), BufferedImage.TYPE_INT_RGB);
         
-        int yMax = frontImage.getHeight();
-        int xMax = frontImage.getWidth();
-        
-        int y = 0;
-        int x = 0;
-        while (y < yMax) {
-            while (x < xMax) {
-                
+        imageSquareAreaPixelLooper(0, 0, frontImage.getWidth() - 1, frontImage.getHeight() - 1, 
+            (x, y)->{
                 if (frontImage.getRGB(x, y) == Color.WHITE.getRGB()) {
                     combined.setRGB(x, y, background.getRGB(x, y));
                 } else {
                     combined.setRGB(x, y, frontImage.getRGB(x, y));
-                }
-                
-                ++x;
-            }
-            
-            x = 0;
-            ++y;
-        }
+                }                    
+            });
         
-        return combined;
+        return combined; 
     }
     
     public static int countNonWhitePixelsFromDefinedImageArea(BufferedImage image, int minX, int maxX, int minY, int maxY) {
-        int nonWhitePixels = 0;
+        int[] nonWhitePixels = {0};
         
-        int yIndex = minY;
-        int xIndex = minX;
-        while (yIndex < maxY) {
-            while (xIndex < maxX) {
-                
-                if (image.getRGB(xIndex, ImageOperations.yTransform(image, yIndex)) != Color.WHITE.getRGB()) {
-                    ++nonWhitePixels;
-                }
-                
-                ++xIndex;
-            }
-            
-            xIndex = minX;
-            ++yIndex;
-        }
+        imageSquareAreaPixelLooper(minX, minY, maxX, maxY,
+            (x, y)->{
+                if (image.getRGB(x, ImageOperations.yTransform(image, y)) != Color.WHITE.getRGB()) {
+                    ++nonWhitePixels[0];
+                }                  
+            });
         
-        return nonWhitePixels;
+        return nonWhitePixels[0];
     }
     
 }

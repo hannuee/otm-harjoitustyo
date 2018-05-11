@@ -47,6 +47,9 @@ public class Game {
     double initialVx;
     double initialVy;
     
+    int ammunitionX;
+    int ammunitionY;
+    
     boolean oldAmmunitionExist;
     int oldAmmunitionX;
     int oldAmmunitionY;
@@ -74,7 +77,7 @@ public class Game {
         this.ammunitionMaxY = level.getAmmunitionMaxY();
         this.ammunitionMinY = level.getAmmunitionMinY();
         
-        this.gameFieldWithBackground = ImageOperations.createNewImageAsCombinationOfFrontImageAndBackground(gameField, background);
+        this.gameFieldWithBackground = ImageOperations.newImageAsCombinationOfFrontAndBackground(gameField, background);
         
         this.oldAmmunitionExist = false;
         
@@ -178,7 +181,7 @@ public class Game {
         return calculateYwithDragResult(t, a, g, v, p);
     }
     
-    private void removeOldAmmunitionIfExistent() {
+    public void removeOldAmmunitionIfExistent() {
         if (oldAmmunitionExist) {
             ImageOperations.insertCircle(gameField, oldAmmunitionX, oldAmmunitionY, AMMUNITION_RADIUS, Color.WHITE, null);
             ImageOperations.insertCircle(gameFieldWithBackground, oldAmmunitionX, oldAmmunitionY, AMMUNITION_RADIUS, null, background);
@@ -186,64 +189,77 @@ public class Game {
         }
     }
     
-    public BufferedImage trajectorySimulation(double seconds) {
-        // Jos ammuksella vanha sijainti niin poistetaan vanhat pixelit.
-        removeOldAmmunitionIfExistent();
-
-        // Lasketaan uusi ammuksen sijainti.
-        int ammunitionX;
-        int ammunitionY;
+    public void calculateNewAmmunitionPosition(double seconds) {
         if (vacuum) {
             ammunitionX = ammunitionX(seconds);
             ammunitionY = ammunitionY(seconds);
         } else {
             ammunitionX = ammunitionXwithDrag(seconds);
             ammunitionY = ammunitionYwithDrag(seconds);
-        }
-
-        // Tarkastetaan rajat:
-        // jos vasen, oikea tai alaraja yli niin palautetaan tyhjä ja muutetaan pelin tilaa.
+        }        
+    }
+    
+    public boolean checkIfAmmunitionTotallyOutOfBounds() {
         if (ammunitionX < -AMMUNITION_RADIUS || gameField.getWidth() + AMMUNITION_RADIUS < ammunitionX || ammunitionY < -AMMUNITION_RADIUS) {
             nextState();
-            nextState();  // Two nextStates because there is no ammunition explosion.
-            return gameFieldWithBackground;
+            nextState();  // Two nextStates because we want to skip explosion simulation.
+            return true;
         }
-
-        // Trace for Vacuum chamber level.
+        return false;
+    }
+    
+    public void addAmmunitionTrailIfInVacuumChamber() {
         if (level.isVacuumPossible()) {
             if (0 < ammunitionX && ammunitionX < background.getWidth() && 0 < ammunitionY && ammunitionY < background.getHeight()) {
                 background.setRGB(ammunitionX, ImageOperations.yTransform(background, ammunitionY), Color.BLACK.getRGB());
             }
-        }
-
-        // Tarkastetaan osuma linnoihin ja maahan samalla kun piirretään ammuksen uutta paikkaa.
-        boolean impact = ImageOperations.insertCircle(gameField, ammunitionX, ammunitionY, AMMUNITION_RADIUS, Color.RED, null);
+        }        
+    }
+    
+    public boolean insertNewAmmunitionAndCheckImpacts() {
+        boolean regularImpact = ImageOperations.insertCircle(gameField, ammunitionX, ammunitionY, AMMUNITION_RADIUS, Color.RED, null);
         ImageOperations.insertCircle(gameFieldWithBackground,  ammunitionX, ammunitionY, AMMUNITION_RADIUS, Color.RED, null);
 
         boolean gameFieldHardBoundaryImpact = level.isVacuumPossible() && 
                 (ammunitionY > level.getAmmunitionMaxY() - AMMUNITION_RADIUS || 
                  ammunitionY < level.getAmmunitionMinY() + AMMUNITION_RADIUS);
 
-        // Jos osui maahan tai linnaan.
-        if (impact || gameFieldHardBoundaryImpact) {
+        return regularImpact || gameFieldHardBoundaryImpact;
+    }
+    
+    public void initializeExplosionSimulation(double seconds) {
+        explosionSeed = new Random().nextInt();
 
-            explosionSeed = new Random().nextInt();
+        oldAmmunitionExist = false;  // Because red ammunition is now considered as explosion graphics.
 
-            oldAmmunitionExist = false;  // Because red ammunitions are now considered as explosion graphics.
+        nextState();
 
-            nextState();
+        explosionX = ammunitionX;
+        explosionY = ammunitionY;
+        explosionStartTime = seconds;        
+    }
+    
+    public void initializeFollowingTrajectorySimulation() {
+        oldAmmunitionExist = true;
+        oldAmmunitionX = ammunitionX;
+        oldAmmunitionY = ammunitionY;        
+    }
+    
+    public BufferedImage trajectorySimulation(double seconds) {
+        
+        removeOldAmmunitionIfExistent();
+        calculateNewAmmunitionPosition(seconds);
+        if (checkIfAmmunitionTotallyOutOfBounds()) return gameFieldWithBackground;
+        addAmmunitionTrailIfInVacuumChamber();
 
-            explosionX = ammunitionX;
-            explosionY = ammunitionY;
-            explosionStartTime = seconds;
-
+        if (insertNewAmmunitionAndCheckImpacts()) {
+            initializeExplosionSimulation(seconds);
         } else {
-            oldAmmunitionExist = true;
-            oldAmmunitionX = ammunitionX;
-            oldAmmunitionY = ammunitionY;
+            initializeFollowingTrajectorySimulation();
         }
         
         return gameFieldWithBackground;
+        
     }
     
     public void explosionExpansion() {
@@ -299,6 +315,8 @@ public class Game {
         }
         return gameFieldWithBackground;
     }
+    
+    
     
     public BufferedImage getSimulationSnapshot(double seconds) {
         if (state == 2 || state == 5) {
