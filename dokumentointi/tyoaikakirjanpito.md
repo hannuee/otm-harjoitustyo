@@ -46,11 +46,19 @@
 | 1.5  |  0.40  | Exit nappi peliin |
 | 1.5  |  5.20  | Grafiikkojen parannus sek‰ vaaditut tietokanta- ja koodimuutokset. |
 | 2.5  |  7.25  | Graafista hiontaa, estetty 2 samannimisen pelaajan peli toisiaan vastaan, iconit, refaktorointia, Checkstyle-korjauksia, lis‰tty testej‰. |
-| yht   | 99.25 | | 
+| 7.5  |  1.60  | Refaktorointia. |
+| 7.5  |  2  | Exceptionien k‰sittelyn parannus. (+ Refaktorointia ja hiontaa) |
+| 8.5  |  1.75  | GUI refaktorointia + hiontaa. |
+| 9.5  |  6.8  | GameService luominen GUIn ja Gamen v‰liin. |
+| 10.5 |  1.66  | ^samaa. |
+| 10.5 |  2.75  | Refaktorointia. |
+| 11.5 |  2.75  | ^samaa |
+| 11.5  |  6.75  | Testien tekemist‰, JavaDoc kommentointia, p‰ivitetty m‰‰rittely ja arkkitehtuuridokumentti, pient‰ siivousta ja refaktorointia, release |
+| yht   | 125.31 | | 
 
 
 
 Yll‰olevat tunnit selkeit‰ tyˆtunteja jolloin tehty sovellusta tietokoneen ‰‰rell‰.
 
-N‰iden tuntien lis‰ksi kertynyt t‰h‰n menness‰ karkean arvion mukaan n. 30 tuntia pohdinta-aikaa, eli pohdittu sovelluksen rakennetta, toimintaa ja toteutusta joko pelk‰st‰‰n tai samalla kun tehty jotain muuta, esim. arkisia askareita.
+N‰iden tuntien lis‰ksi kertynyt t‰h‰n menness‰ karkean arvion mukaan n. 40 tuntia pohdinta-aikaa, eli pohdittu sovelluksen rakennetta, toimintaa ja toteutusta joko pelk‰st‰‰n tai samalla kun tehty jotain muuta, esim. arkisia askareita.
 
