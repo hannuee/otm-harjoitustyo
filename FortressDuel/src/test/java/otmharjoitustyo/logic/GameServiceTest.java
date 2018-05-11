@@ -35,7 +35,7 @@ public class GameServiceTest {
     @Before
     public void setUp() throws SQLException, IOException {
         gameService = new GameService(levelDao, playerDao);
-        gameService.initializeGame("Mountains");
+        gameService.initializeGame("Vacuum Chamber");
         gameService.takeNamesAndCheckIfTheyAreTheSame("Emma", "Annie");
         gameService.initializePlayers();
     }
@@ -65,25 +65,25 @@ public class GameServiceTest {
     // Name entry scene:  (initializePlayers() method is tested indirectly through setUp method.)
     
     @Test
-    public void indenticalNamesAreRejectedAfterInitialization() throws SQLException, IOException {
+    public void indenticalNamesAreNoticedToBeIdenticalAfterInitialization() throws SQLException, IOException {
         // Test #3 of 4 where local GameService is used instead of setUp GameService
         // in order to achieve realistic conditions.
         GameService gameServiceLocal = new GameService(levelDao, playerDao);
         gameServiceLocal.initializeGame("Mountains");
-        assertFalse(gameServiceLocal.takeNamesAndCheckIfTheyAreTheSame("Bob", "Bob"));
+        assertTrue(gameServiceLocal.takeNamesAndCheckIfTheyAreTheSame("Bob", "Bob"));
     }
     
     @Test
-    public void nonIndenticalNamesAreAcceptedAfterInitialization() throws SQLException, IOException {
+    public void nonIndenticalNamesAreNoticedToBeNonIdenticalAfterInitialization() throws SQLException, IOException {
         // Test #4 of 4 where local GameService is used instead of setUp GameService
         // in order to achieve realistic conditions.
         GameService gameServiceLocal = new GameService(levelDao, playerDao);
         gameServiceLocal.initializeGame("Mountains");
-        assertTrue(gameServiceLocal.takeNamesAndCheckIfTheyAreTheSame("Emma", "Annie"));
+        assertFalse(gameServiceLocal.takeNamesAndCheckIfTheyAreTheSame("Emma", "Annie"));
     }
     
     
-    // Game scene AND GameBar:
+    // Game scene AND GameBar:  (getSimulationSnapshot(double seconds) method is tested indirectly through other test methods.)
 
     @Test
     public void leftPlayerNameIsCorrect() {
@@ -117,8 +117,10 @@ public class GameServiceTest {
     
     @Test
     public void vacuumInformationIsCorrect() {
-        assertFalse(gameService.isVacuumPossibleInThisLevel());
+        assertTrue(gameService.isVacuumPossibleInThisLevel());
     }
+    
+    // CUSTOM JOSSA TESTATAAN FALSE^^^^!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     
     @Test
     public void gameStateIndicatesThatItsTurnOfTheLeftPlayer() {
@@ -126,167 +128,82 @@ public class GameServiceTest {
     }
     
     @Test
-    public void s() {
-        
-    }
-    
-    public boolean fireCannonWithPreviousSettingsIfPossible() {
-        if(game.getState() == 1 && leftPrevious[2] != 0){ 
-            game.setAndFireCannon(leftPrevious[0], leftPrevious[1]);
-            return true;
-        } else if(game.getState() == 4 && rightPrevious[2] != 0){
-            game.setAndFireCannon(rightPrevious[0], rightPrevious[1]);
-            return true;
-        }
-        return false;
+    public void cannonCanNotBeFiredWithPreviousSettingsYet() {
+        assertFalse(gameService.fireCannonWithPreviousSettingsIfPossible());
     }
     
     @Test
-    public void s() {
-        
+    public void leftPlayerCanFireCannonWithPreviousSettingsAfterOneOwnShot() {
+        assertTrue(gameService.fireCannonIfPossible(600, 350));
+        assertNotNull(gameService.getSimulationSnapshot(20.0));
+        assertTrue(gameService.fireCannonIfPossible(-600, 350));
+        assertNotNull(gameService.getSimulationSnapshot(20.0));
+        assertTrue(gameService.fireCannonWithPreviousSettingsIfPossible());
     }
     
-    public boolean fireCannonIfPossible(int mouseX, int mouseY) {
-        if (game.getState() == 1) {
-            int initialVx = mouseX - level.getLeftCannonX();
-            int initialVy = level.getGameField().getHeight() - mouseY - level.getLeftCannonY();  // Tähänkin jotkut hienot transformit.
-            
-            game.setAndFireCannon(initialVx, initialVy);
+    @Test
+    public void rightPlayerCanFireCannonWithPreviousSettingsAfterOneOwnShot() {
+        assertTrue(gameService.fireCannonIfPossible(600, 350));
+        assertNotNull(gameService.getSimulationSnapshot(20.0));
+        assertTrue(gameService.fireCannonIfPossible(-600, 350));
+        assertNotNull(gameService.getSimulationSnapshot(20.0));
+        assertTrue(gameService.fireCannonIfPossible(-600, 350));
+        assertNotNull(gameService.getSimulationSnapshot(20.0));
+        assertTrue(gameService.fireCannonWithPreviousSettingsIfPossible());
+    }
+    
+    @Test
+    public void cannonCanBeFired() {
+        assertTrue(gameService.fireCannonIfPossible(600, 350));
+    }
+    
+    @Test
+    public void cannonCanNotBeFiredBecauseSimulationHasNotEnded() {
+        assertTrue(gameService.fireCannonIfPossible(600, 350));
+        assertFalse(gameService.fireCannonIfPossible(600, 350));
+    }
+    
+    @Test
+    public void cannonCanBeFiredAfterSimulationHasEnded() {
+        assertTrue(gameService.fireCannonIfPossible(600, 350));
+        assertNotNull(gameService.getSimulationSnapshot(20.0));
+        assertTrue(gameService.fireCannonIfPossible(-600, 350));
+    }
+    
+    @Test
+    public void staticSnapshotWorks() {
+        assertNotNull(gameService.getStaticSnapshot());
+    }
+    
+    @Test
+    public void theGameIsNotOverInTheBeginning() throws SQLException {
+        assertFalse(gameService.isGameOver());
+    }
+    
+    @Test
+    public void vacuumStateCanBeChangedONandOFF() {
+        assertTrue(gameService.changeVacuumStateIfPossible());
+        assertFalse(gameService.changeVacuumStateIfPossible());
+    }
 
-            // For the Vacuum chamber level, lets memorize the aiming information.
-            if (level.isVacuumPossible()) {
-                leftPrevious[0] = initialVx;
-                leftPrevious[1] = initialVy;
-                leftPrevious[2] = 1; 
-            }
-
-            return true;
-        } else if (game.getState() == 4) {
-            int initialVx = mouseX - level.getRightCannonX();
-            int initialVy = level.getGameField().getHeight() - mouseY - level.getRightCannonY();  // Tähänkin jotkut hienot transformit.
-            
-            game.setAndFireCannon(initialVx, initialVy);  
-
-            // For the Vacuum chamber level, lets memorize the aiming information.
-            if (level.isVacuumPossible()) {
-                rightPrevious[0] = initialVx;
-                rightPrevious[1] = initialVy;
-                rightPrevious[2] = 1; 
-            }
-
-            return true;
-        }
-        return false;
+    @Test
+    public void leftCannonXisCorrect() {
+        assertEquals(194, gameService.getLeftCannonX());
     }
     
     @Test
-    public void s() {
-        
-    }
-    
-    public BufferedImage getSimulationSnapshot(double simulationTime) {
-        return game.getSimulationSnapshot(simulationTime);
+    public void leftCannonYisCorrect() {
+        assertEquals(153, gameService.getLeftCannonY());
     }
     
     @Test
-    public void s() {
-        
-    }
-    
-    public BufferedImage getStaticSnapshot() {
-        return game.getStaticSnapshot();
+    public void rightCannonXisCorrect() {
+        assertEquals(1009, gameService.getRightCannonX());
     }
     
     @Test
-    public void s() {
-        
-    }
-    
-    public boolean isGameOver() throws SQLException {
-        if (game.getState() == 1) {  // The game can only end when there has been even amount of turns.
-
-            int leftFortressPixels = game.leftFortressPixels();
-            int rightFortressPixels = game.rightFortressPixels();
-
-            // Check that at least one of the fortresses is finished, meaning the game is over.
-            if (leftFortressPixels == 0 || rightFortressPixels == 0) {
-                if (leftFortressPixels == 0 && rightFortressPixels == 0) {  // TIE!
-                    leftPlayer.addTie();
-                    rightPlayer.addTie();
-                } else if (leftFortressPixels == 0) {  // Right player won!
-                    leftPlayer.addLoss();
-                    rightPlayer.addWin();
-                } else {  // Left player won!
-                    leftPlayer.addWin();
-                    rightPlayer.addLoss();
-                }
-
-                playerDao.update(leftPlayer);
-                playerDao.update(rightPlayer);
-
-                return true;
-            }
-        }
-     
-        return false;  // The game is not over yet.
-    }
-    
-    @Test
-    public void s() {
-        
-    }
-    
-    public boolean changeVacuumStateIfPossible() {
-        if (game.getState() == 1 || game.getState() == 4) {  // Can not be changed while simulation is in progress.
-            if (game.getVacuum()) {
-                game.setVacuum(false);
-            } else {
-                game.setVacuum(true);
-            }
-        }
-        return game.getVacuum();
-    }
-    
-    
-    @Test
-    public void s() {
-        
-    }
-    
-    public int getLeftCannonX() {
-        return level.getLeftCannonX();
-    }
-    
-    @Test
-    public void s() {
-        
-    }
-    
-    public int getLeftCannonY() {
-        return level.getLeftCannonY();
-    }
-    
-    @Test
-    public void s() {
-        
-    }
-    
-    public int getRightCannonX() {
-        return level.getRightCannonX();
-    }
-    
-    @Test
-    public void s() {
-        
-    }
-    
-    public int getRightCannonY() {
-        return level.getRightCannonY();
-    }
-    
-    @Test
-    public void s() {
-        
+    public void rightCannonYisCorrect() {
+        assertEquals(153, gameService.getRightCannonY());
     }
     
 }
