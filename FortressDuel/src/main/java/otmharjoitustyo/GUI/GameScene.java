@@ -47,17 +47,7 @@ public class GameScene {
                 
                 double simulationTime = (nowTime - startTime)/1000000000.0;
 
-                // FPS
-                int simuTime = (int)simulationTime;
-                if(current == simuTime){
-                    ++counter;
-                } else {
-                    System.out.println("Frames during " + current + "s: " + counter);
-                    current = simuTime;
-                    counter = 1;
-                }
-
-                BufferedImage gameImage = gameService.getSimulationSnapshot(1.5*simulationTime);
+                BufferedImage gameImage = gameService.getSimulationSnapshot(2.0*simulationTime);
                 if(gameImage != null){
                     Image image = SwingFXUtils.toFXImage(gameImage, null);
                     pen.drawImage(image, 0, 0);
