@@ -1,8 +1,9 @@
 /**
  * @author Hannu Erälaukko
  */
-package otmharjoitustyo.logic;
+package otmharjoitustyo.domain;
 
+import otmharjoitustyo.domain.Game;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.sql.SQLException;

@@ -1,7 +1,7 @@
 /**
  * @author Hannu Erälaukko
  */
-package otmharjoitustyo.logic;
+package otmharjoitustyo.domain;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -18,7 +18,7 @@ import otmharjoitustyo.database.LevelDao;
 import otmharjoitustyo.database.PlayerDao;
 import otmharjoitustyo.domain.Level;
 import otmharjoitustyo.domain.Player;
-import otmharjoitustyo.logic.GameService;
+import otmharjoitustyo.domain.GameService;
 
 public class GameServiceTest {
     

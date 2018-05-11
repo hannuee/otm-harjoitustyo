@@ -1,7 +1,7 @@
 /**
  * @author Hannu Erälaukko
  */
-package otmharjoitustyo.logic;
+package otmharjoitustyo.domain;
 
 public interface PixelHandler {
     

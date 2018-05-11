@@ -1,9 +1,7 @@
 /**
  * @author Hannu Erälaukko
  */
-package otmharjoitustyo.logic;
-
-import otmharjoitustyo.domain.Level;
+package otmharjoitustyo.domain;
 
 import java.util.Random;
 import java.awt.image.BufferedImage;

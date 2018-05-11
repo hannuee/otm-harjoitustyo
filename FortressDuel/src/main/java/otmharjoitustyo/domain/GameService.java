@@ -1,12 +1,10 @@
 /**
  * @author Hannu Erälaukko
  */
-package otmharjoitustyo.logic;
+package otmharjoitustyo.domain;
 
 import otmharjoitustyo.database.LevelDao;
 import otmharjoitustyo.database.PlayerDao;
-import otmharjoitustyo.domain.Level;
-import otmharjoitustyo.domain.Player;
 
 import java.awt.image.BufferedImage;
 import java.sql.SQLException;

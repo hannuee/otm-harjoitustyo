@@ -3,7 +3,7 @@
  */
 package otmharjoitustyo.GUI;
 
-import otmharjoitustyo.logic.GameService;
+import otmharjoitustyo.domain.GameService;
 import otmharjoitustyo.database.*;
 
 import javafx.application.Application;

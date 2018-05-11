@@ -3,7 +3,7 @@
  */
 package otmharjoitustyo.GUI;
 
-import otmharjoitustyo.logic.GameService;
+import otmharjoitustyo.domain.GameService;
 
 import javafx.scene.input.MouseEvent;
 import javafx.animation.AnimationTimer;

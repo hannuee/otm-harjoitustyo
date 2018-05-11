@@ -1,7 +1,7 @@
 /**
  * @author Hannu Erälaukko
  */
-package otmharjoitustyo.logic;
+package otmharjoitustyo.domain;
 
 import java.awt.image.BufferedImage;
 import java.awt.Color;
