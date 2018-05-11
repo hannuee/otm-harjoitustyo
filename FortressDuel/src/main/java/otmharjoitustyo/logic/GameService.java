@@ -115,17 +115,17 @@ public class GameService {
         return game.getState();
     }
     
-    public boolean getVacuumState() {     // TURHA??!?!?!??!?!
-        return game.getVacuum();
-    }
+//    public boolean getVacuumState() {     // TURHA??!?!?!??!?!
+//        return game.getVacuum();
+//    }
     
-    public void setVacuumState(boolean state) {    // TURHA??!?!?!??!?!
-        game.setVacuum(state);
-    }
+//    public void setVacuumState(boolean state) {    // TURHA??!?!?!??!?!
+//        game.setVacuum(state);
+//    }
     
-    public void setAndFireCannon(int initVx, int initVy) {   // TURHA??!?!?!??!?!
-        game.setAndFireCannon(initVx, initVy);
-    }
+//    public void setAndFireCannon(int initVx, int initVy) {   // TURHA??!?!?!??!?!
+//        game.setAndFireCannon(initVx, initVy);
+//    }
     
     public BufferedImage getSimulationSnapshot(double simulationTime) {
         return game.getSimulationSnapshot(simulationTime);

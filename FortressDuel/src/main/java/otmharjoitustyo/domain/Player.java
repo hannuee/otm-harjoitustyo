@@ -17,6 +17,7 @@ public class Player {
         this.losses = losses;
     }
     
+    
     public String getName() {
         return this.name;
     }
@@ -32,6 +33,7 @@ public class Player {
     public int getLosses() {
         return this.losses;
     }
+    
     
     public void addWin() {
         ++this.wins;

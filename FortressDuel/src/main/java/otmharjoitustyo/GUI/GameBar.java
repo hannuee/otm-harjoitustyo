@@ -1,7 +1,7 @@
 /**
  * @author Hannu Erälaukko
  */
-package otmharjoitustyo.GUI.elements;
+package otmharjoitustyo.GUI;
 
 import otmharjoitustyo.logic.GameService;
 import otmharjoitustyo.GUI.SelectionScene;
@@ -37,7 +37,7 @@ public class GameBar {
     
     private Button vacuumControl;
     
-    HBox gameBarBox;
+    private HBox gameBarBox;
     
     public GameBar(Main main, GameService gameService){
         this.main = main;

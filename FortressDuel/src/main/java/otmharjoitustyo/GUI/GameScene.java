@@ -4,7 +4,6 @@
 package otmharjoitustyo.GUI;
 
 import otmharjoitustyo.logic.GameService;
-import otmharjoitustyo.GUI.elements.GameBar;
 
 import java.awt.image.BufferedImage;
 import javafx.animation.AnimationTimer;

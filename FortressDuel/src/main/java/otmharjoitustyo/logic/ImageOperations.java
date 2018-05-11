@@ -52,7 +52,6 @@ public class ImageOperations {
                                     circleX, circleY, radius, pixelHandler);
     }
     
-    // image handler,  pixel handler
     public static boolean insertCircle(BufferedImage image, int circleX, int circleY, int radius, 
                                                           Color color, BufferedImage fillImage) {
         int[] nonWhitePixelsOverwritten = {0};

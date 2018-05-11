@@ -1,79 +1,31 @@
 /**
  * @author Hannu Erälaukko
  */
+package otmharjoitustyo.logic;
 
-import otmharjoitustyo.logic.*;
-import otmharjoitustyo.domain.*;
-import otmharjoitustyo.database.*;
-
-import java.util.ArrayList;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.sql.SQLException;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import otmharjoitustyo.database.Database;
+import otmharjoitustyo.database.LevelDao;
+import otmharjoitustyo.domain.Level;
 
-public class AllTest {
+public class GameTest {
     
-    static Level level = null;
+    Level level;
     
-    @BeforeClass
-    public static void setUpClass() throws SQLException, IOException {
+    public GameTest() throws SQLException, IOException {
         Database database = new Database("jdbc:sqlite:Gamedata.db");
         LevelDao levelDao = new LevelDao(database);
         
         level = levelDao.findOne("Meadow");
     }
-    
-    
-    // Database:
-    
-    @Test
-    public void databaseReturnsLevel() throws SQLException, IOException {
-        assertNotNull(level);
-    }
-    
-    @Test
-    public void databaseListsAllLevels() throws SQLException, IOException {
-        Database database = new Database("jdbc:sqlite:Gamedata.db");
-        LevelDao levelDao = new LevelDao(database);
-        
-        ArrayList<Level> levels = levelDao.listAll();
-        
-        assertEquals(3, levels.size());
-    }
-    
-    @Test
-    public void databaseReturnsCorrectPlayer() throws SQLException, IOException {
-        Database database = new Database("jdbc:sqlite:Gamedata.db");
-        PlayerDao playerDao = new PlayerDao(database);
-        
-        Player player = playerDao.findOne("Jack");
-        assertEquals("Jack", player.getName());
-    }
-    
-    @Test
-    public void databaseReturnsWinners() throws SQLException, IOException {
-        Database database = new Database("jdbc:sqlite:Gamedata.db");
-        PlayerDao playerDao = new PlayerDao(database);
-        
-        ArrayList<Player> players = playerDao.findWinners();
-        assertEquals(5, players.size());
-    }
-    
-    
-    // ImageOperations:
-    
-    @Test
-    public void yellowBuddieCounterCountsZero() {
-        assertEquals(0, ImageOperations.countYellowBuddies(level.getGameField(), 50, 50, 0, level.getGameField().getWidth(), 0, level.getGameField().getHeight()));
-    }
-    
     
     // Initialization of the game:
     
@@ -91,11 +43,16 @@ public class AllTest {
     }
     
     @Test
-    public void gameResultIsNullIfAskedAfterInitialization() throws SQLException, IOException {
+    public void leftFortressPercentageIsCorrectInTheBeginning() throws SQLException, IOException {
         Game game = new Game(level);
-        assertNull(game.checkWinner());
+        assertTrue(0.99999999 < game.leftFortressPercentage());
     }
     
+    @Test
+    public void rightFortressPercentageIsCorrectInTheBeginning() throws SQLException, IOException {
+        Game game = new Game(level);
+        assertTrue(0.99999999 < game.rightFortressPercentage());
+    }
     
     // Firing of the cannon and ammunition trajectory simulation:
     // (Gamefield is considered to be located on a normal cartesian coordinate plane.

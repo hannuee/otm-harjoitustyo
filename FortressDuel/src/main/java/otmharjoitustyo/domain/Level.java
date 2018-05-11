@@ -71,6 +71,7 @@ public class Level {
         this.thumbnailHover = thumbnailHover;
     }
     
+    
     public String getName() {
         return this.name;
     }
