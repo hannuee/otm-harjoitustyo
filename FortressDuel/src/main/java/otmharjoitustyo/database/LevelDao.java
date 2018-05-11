@@ -5,12 +5,10 @@ package otmharjoitustyo.database;
 
 import otmharjoitustyo.domain.Level;
 
-import java.util.ArrayList;
-
-import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import java.io.IOException;
-
+import java.util.ArrayList;
+import java.awt.image.BufferedImage;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

@@ -8,15 +8,10 @@ import otmharjoitustyo.logic.GameService;
 import java.awt.image.BufferedImage;
 import javafx.animation.AnimationTimer;
 import javafx.embed.swing.SwingFXUtils;
-import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
@@ -30,7 +25,7 @@ public class GameScene {
         GameBar gameBar = new GameBar(main, gameService);
         gameBar.indicateTurn();
         
-        // Simulaation näyttäminen.
+        // Display of the simulation:
         AnimationTimer simulation = new AnimationTimer() {
             
             long startTime = -1;
@@ -48,7 +43,7 @@ public class GameScene {
                 double simulationTime = (nowTime - startTime)/1000000000.0;
 
                 BufferedImage gameImage = gameService.getSimulationSnapshot(2.0*simulationTime);
-                if(gameImage != null){
+                if(gameImage != null){  // null signals that the simulation has ended.
                     Image image = SwingFXUtils.toFXImage(gameImage, null);
                     pen.drawImage(image, 0, 0);
                 } else {
@@ -57,6 +52,7 @@ public class GameScene {
                     
                     gameBar.updateProgressBars();
                     
+                    // Game over check.
                     try {
                         if (gameService.isGameOver()) {
                             new SelectionScene(main, gameService);

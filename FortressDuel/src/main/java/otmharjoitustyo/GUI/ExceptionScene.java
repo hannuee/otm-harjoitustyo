@@ -16,7 +16,7 @@ public class ExceptionScene {
     
     public ExceptionScene(Main main, GameService gameService, String message){
         VBox vbox = new VBox();
-        vbox.setPrefWidth(400);  // min aiemman ikkunan tiedoista????
+        vbox.setPrefWidth(400);  
         vbox.setPrefHeight(400);
         vbox.setSpacing(40);
         vbox.setPadding(new Insets(30, 30, 30, 30));

@@ -6,7 +6,6 @@ package otmharjoitustyo.database;
 import otmharjoitustyo.domain.Player;
 
 import java.util.ArrayList;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

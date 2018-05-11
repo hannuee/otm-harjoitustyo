@@ -6,7 +6,6 @@ package otmharjoitustyo.logic;
 import otmharjoitustyo.domain.Level;
 
 import java.util.Random;
-
 import java.awt.image.BufferedImage;
 import java.awt.Color;
 

@@ -7,8 +7,6 @@ import otmharjoitustyo.database.LevelDao;
 import otmharjoitustyo.database.PlayerDao;
 import otmharjoitustyo.domain.Level;
 import otmharjoitustyo.domain.Player;
-import otmharjoitustyo.GUI.ExceptionScene;
-import otmharjoitustyo.GUI.SelectionScene;
 
 import java.awt.image.BufferedImage;
 import java.sql.SQLException;
@@ -100,11 +98,11 @@ public class GameService {
     }
     
     public int getGameFieldWidth() {
-        return level.getGameField().getWidth();    // KÄYTTÖ MYÖS MUUALLA?????
+        return level.getGameField().getWidth();   
     } 
     
     public int getGameFieldHeight() {
-        return level.getGameField().getHeight();   // KÄYTTÖ MYÖS MUUALLA?????
+        return level.getGameField().getHeight();   
     }
     
     public boolean isVacuumPossibleInThisLevel() {
@@ -114,18 +112,6 @@ public class GameService {
     public int getGameState() {    
         return game.getState();
     }
-    
-//    public boolean getVacuumState() {     // TURHA??!?!?!??!?!
-//        return game.getVacuum();
-//    }
-    
-//    public void setVacuumState(boolean state) {    // TURHA??!?!?!??!?!
-//        game.setVacuum(state);
-//    }
-    
-//    public void setAndFireCannon(int initVx, int initVy) {   // TURHA??!?!?!??!?!
-//        game.setAndFireCannon(initVx, initVy);
-//    }
     
     public BufferedImage getSimulationSnapshot(double simulationTime) {
         return game.getSimulationSnapshot(simulationTime);
@@ -189,7 +175,7 @@ public class GameService {
     public boolean fireCannonIfPossible(int mouseX, int mouseY) {
         if (game.getState() == 1) {
             int initialVx = mouseX - level.getLeftCannonX();
-            int initialVy = level.getGameField().getHeight() - mouseY - level.getLeftCannonY();  // Tähänkin jotkut hienot transformit.
+            int initialVy = level.getGameField().getHeight() - mouseY - level.getLeftCannonY(); 
             
             game.setAndFireCannon(initialVx, initialVy);
 
@@ -203,7 +189,7 @@ public class GameService {
             return true;
         } else if (game.getState() == 4) {
             int initialVx = mouseX - level.getRightCannonX();
-            int initialVy = level.getGameField().getHeight() - mouseY - level.getRightCannonY();  // Tähänkin jotkut hienot transformit.
+            int initialVy = level.getGameField().getHeight() - mouseY - level.getRightCannonY(); 
             
             game.setAndFireCannon(initialVx, initialVy);  
 

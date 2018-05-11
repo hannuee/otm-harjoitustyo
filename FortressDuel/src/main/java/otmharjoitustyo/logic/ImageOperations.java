@@ -72,8 +72,6 @@ public class ImageOperations {
         return nonWhitePixelsOverwritten[0] == 1;
     }
     
-    // advance päällä: Kasvata keltaista alueta punaisella kaverisääntöjen ja satunnaisuuden perusteella.
-    // pois päältä:    Vaihda punaiset keltaisiksi.
     public static void explosionAdvancer(BufferedImage image, int explosionSeed, 
                                    int circleX, int circleY, int radius, 
                                    boolean advance, Color color, Color replace, BufferedImage fillImage) {

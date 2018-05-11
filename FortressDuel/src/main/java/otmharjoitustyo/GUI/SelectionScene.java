@@ -22,10 +22,6 @@ public class SelectionScene {
     public SelectionScene(Main main, GameService gameService) {
         
         VBox vboxLevels = new VBox();
-//        vboxLevels.setPrefSize(300, 180);
-//        vboxLevels.setSpacing(10);
-//        vboxLevels.setPadding(new Insets(30, 30, 30, 30));
-        
 
         ArrayList<Level> levels = null;
         

@@ -4,8 +4,6 @@
 package otmharjoitustyo.GUI;
 
 import otmharjoitustyo.logic.GameService;
-import otmharjoitustyo.GUI.SelectionScene;
-import otmharjoitustyo.GUI.Main;
 
 import javafx.scene.input.MouseEvent;
 import javafx.animation.AnimationTimer;
