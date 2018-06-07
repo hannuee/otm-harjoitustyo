@@ -48,6 +48,7 @@ public class Main extends Application {
     
     public void setNewSceneOnStage(Scene newScene){
         stage.setScene(newScene);
+        stage.centerOnScreen();
     }
     
 }

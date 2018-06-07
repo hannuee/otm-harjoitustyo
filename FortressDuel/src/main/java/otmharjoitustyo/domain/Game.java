@@ -27,7 +27,8 @@ public class Game {
      */
     private Level level;
     // Due to possible performance gains, some of the information from the given Level 
-    // is copied to the Game instead of using it by reference. 
+    // is copied to the Game instead of using it by reference.
+    // gameField and background are here for the sake of clarity.
     private BufferedImage gameField;
     private BufferedImage background;
     private int leftCannonX;

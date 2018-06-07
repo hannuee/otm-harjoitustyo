@@ -59,7 +59,8 @@ public class NameEntryScene {
         }
         
         VBox vbox = new VBox();
-        vbox.setPrefHeight(270);
+        vbox.setPrefSize(400, 300);
+        vbox.setStyle("-fx-alignment: center;");
         vbox.setSpacing(10);
         vbox.setPadding(new Insets(30, 30, 30, 30));
         vbox.getChildren().addAll(leftSideLabel, leftSideName, rightSideLabel, rightSideName, startButton);
